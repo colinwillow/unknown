@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1057,11 +1058,425 @@ footer{
   .scroll-indicator{display:none;}
   .footer-bottom{flex-direction:column;text-align:center;}
 }
+
+
+/* ============ DUAL CAROUSEL STRIP (after hero) ============ */
+.carousel-strip{
+  position:relative;
+  background:var(--black);
+  padding:20px 0 8px;
+  border-top:1px solid rgba(200,150,10,.08);
+  border-bottom:1px solid rgba(200,150,10,.08);
+}
+.carousel-strip + .carousel-strip{
+  border-top:none;padding-top:8px;
+}
+.carousel-strip-label{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 20px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;
+  color:rgba(239,233,220,.4);text-transform:uppercase;
+}
+.carousel-strip-label b{color:var(--gold);font-weight:400;}
+.carousel-strip-label .pulse-dot{display:inline-block;width:5px;height:5px;background:var(--gold);
+  border-radius:50%;margin-right:6px;animation:blink 1.4s infinite;}
+.carousel-track{
+  display:flex;gap:6px;overflow:hidden;padding:0 20px;
+  mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);
+}
+.carousel-track-inner{
+  display:flex;gap:6px;
+  animation:carouselSlide 40s linear infinite;
+  flex-shrink:0;
+}
+.carousel-strip:hover .carousel-track-inner,
+.carousel-strip.paused .carousel-track-inner{animation-play-state:paused;}
+.carousel-item{
+  flex-shrink:0;width:240px;height:300px;
+  overflow:hidden;position:relative;
+  background:var(--off);
+}
+.carousel-item.product{width:280px;height:300px;background:var(--off);}
+.carousel-item img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  filter:grayscale(15%) contrast(1.08);
+  transition:transform .8s,filter .4s;
+}
+.carousel-item:hover img{transform:scale(1.04);filter:grayscale(0%);}
+.carousel-item::after{
+  content:attr(data-tag);
+  position:absolute;bottom:10px;left:10px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;
+  color:var(--gold);background:rgba(5,5,4,.7);padding:3px 6px;
+  text-transform:uppercase;opacity:0;transition:opacity .25s;
+}
+.carousel-item:hover::after{opacity:1;}
+@keyframes carouselSlide{
+  from{transform:translateX(0);}
+  to{transform:translateX(calc(-100% - 6px));}
+}
+.carousel-track-inner.reverse{animation-direction:reverse;}
+
+/* ============ MOBILE-FIRST DENSITY OVERRIDES ============ */
+@media (max-width:640px){
+  /* Trim the section titles dramatically on mobile */
+  .section-title{font-size:clamp(34px,9vw,56px) !important;letter-spacing:-1px;}
+  .hero-title{font-size:clamp(56px,17vw,90px) !important;letter-spacing:-1px;}
+  .statement-quote{font-size:clamp(28px,8vw,46px) !important;line-height:1;}
+  .eyewear-title{font-size:clamp(36px,10vw,60px) !important;}
+  .newsletter-title{font-size:clamp(46px,13vw,80px) !important;line-height:.9;}
+  
+  /* Manifesto type scaled down so you can read in one screen */
+  .section-manifesto{padding:48px 20px !important;}
+  .manifesto-text{font-size:clamp(18px,5vw,24px) !important;line-height:1.35 !important;}
+  .manifesto-text strong{font-size:1.2em !important;margin:8px 0 !important;}
+  .manifesto-text p{margin-bottom:14px !important;}
+  .manifesto-tag{padding-bottom:10px !important;margin-bottom:18px !important;font-size:10px;}
+  
+  /* Section padding: tighter top/bottom */
+  .section-collections,.section-statement,.section-eyewear,.section-runway,
+  .section-lookbook,.section-newsletter{padding-top:56px !important;padding-bottom:56px !important;}
+  .section-header{margin-bottom:24px !important;gap:12px;}
+  .section-header > div{display:flex;flex-direction:column;gap:4px;}
+  .section-label{font-size:9px !important;letter-spacing:3px !important;margin-bottom:6px !important;}
+  
+  /* Stats: even tighter */
+  .stat-num{font-size:48px !important;}
+  .stat-item{padding:24px 16px !important;}
+  .stat-label{font-size:9px !important;letter-spacing:3px !important;}
+  
+  /* Collections: 2-col instead of 1-col */
+  .collections-grid{
+    grid-template-columns:1fr 1fr !important;
+    grid-template-rows:auto !important;
+    gap:4px !important;
+  }
+  .col-card{height:230px !important;}
+  .col-card:first-child{
+    grid-column:1/3 !important;
+    height:340px !important;
+  }
+  .col-name{font-size:18px !important;line-height:1 !important;letter-spacing:1px !important;}
+  .col-card:first-child .col-name{font-size:28px !important;letter-spacing:2px !important;}
+  .col-card-info{padding:14px !important;}
+  .col-tag{font-size:8px !important;padding:2px 6px !important;letter-spacing:2px !important;}
+  .col-meta{font-size:9px !important;margin-top:8px !important;letter-spacing:1px !important;}
+  .col-meta b{font-size:11px !important;}
+  .col-card-num{font-size:11px !important;top:10px;right:10px;}
+  .col-card-corner{font-size:8px;top:10px;left:10px;letter-spacing:2px;}
+  
+  /* Runway: peek next card (show 1.25-1.4 cards) */
+  .runway-card{flex:0 0 76vw !important;height:420px !important;}
+  .runway-name{font-size:18px !important;letter-spacing:1.5px !important;}
+  .runway-info{padding:18px !important;}
+  .runway-meta{font-size:9px !important;letter-spacing:1px !important;}
+  .runway-meta b{font-size:11px !important;}
+  .runway-tag{font-size:8px !important;padding:3px 6px !important;letter-spacing:2px !important;}
+  .runway-num{font-size:18px !important;}
+  
+  /* Statement images stack better */
+  .section-statement{gap:32px !important;}
+  .statement-images{gap:4px !important;}
+  .statement-img:first-child{height:200px !important;}
+  .statement-img{height:160px !important;}
+  .statement-content{padding-top:0;}
+  .statement-body{font-size:14px !important;line-height:1.6 !important;margin-bottom:24px !important;}
+  
+  /* Eyewear */
+  .section-eyewear{gap:32px !important;}
+  .eyewear-desc{font-size:14px !important;line-height:1.6 !important;margin-bottom:24px !important;}
+  
+  /* Lookbook: 3-col on mobile (denser) */
+  .lookbook-grid{grid-template-columns:repeat(3,1fr) !important;gap:3px !important;}
+  .look-item.tall{grid-row:span 2;aspect-ratio:auto;}
+  .look-item.wide{grid-column:span 2;aspect-ratio:3/2;}
+  .look-item:nth-child(8){display:block !important;}
+  .look-item-info{font-size:8px !important;padding:8px !important;letter-spacing:1.5px !important;}
+  .look-item-info b{font-size:11px !important;letter-spacing:1px !important;}
+  
+  /* Carousels on mobile: smaller items */
+  .carousel-item{width:160px !important;height:200px !important;}
+  .carousel-item.product{width:180px !important;height:200px !important;}
+  .carousel-strip{padding:14px 0 !important;}
+  .carousel-strip-label{padding:0 16px 8px !important;font-size:8px !important;letter-spacing:2px !important;}
+  .carousel-track{padding:0 16px !important;}
+  
+  /* Newsletter tighter */
+  .section-newsletter{padding:60px 20px !important;}
+  .newsletter-pretitle{font-size:9px !important;letter-spacing:3px !important;margin-bottom:12px !important;}
+  .newsletter-sub{font-size:14px !important;margin-bottom:24px !important;}
+  
+  /* Footer: 2-col on mobile, not 1-col */
+  .footer-top{grid-template-columns:1fr 1fr !important;gap:28px !important;}
+  .footer-top > div:first-child{grid-column:1/3;}
+  .footer-brand-name{font-size:38px !important;}
+  .footer-col-title{font-size:12px !important;letter-spacing:3px !important;margin-bottom:14px !important;}
+  .footer-links a{font-size:10px !important;letter-spacing:1px !important;}
+  .footer-links{gap:8px !important;}
+  .footer-marquee-mega{font-size:64px !important;letter-spacing:-1px !important;margin-bottom:32px !important;}
+  
+  /* Tickers mobile: smaller */
+  .ticker-item{font-size:14px !important;letter-spacing:3px !important;padding:0 18px !important;}
+  
+  /* Hide the giant section title oversized backgrounds on mobile */
+  .statement-bg{display:none !important;}
+  .newsletter-bg{display:none !important;}
+}
+
+/* MEDIUM: tighten on tablet too */
+@media (min-width:641px) and (max-width:1024px){
+  .collections-grid{
+    grid-template-columns:1fr 1fr !important;
+    grid-template-rows:auto !important;
+  }
+  .col-card{height:340px !important;}
+  .col-card:first-child{grid-row:auto !important;grid-column:1/3 !important;height:420px !important;}
+}
+
+/* HUD: don't double up — make it more transparent and smaller */
+.hud{font-size:9px !important;letter-spacing:2px !important;}
+.hud-block{padding:5px 10px !important;}
+@media (max-width:640px){
+  .hud{top:10px !important;left:10px !important;right:10px !important;}
+  .hud-block{font-size:8px !important;letter-spacing:1.5px !important;padding:4px 8px !important;}
+}
+
+
+
+/* ============ HORIZONTAL SCROLL LOCK ============ 
+ * Belt-and-suspenders fix: any element wider than the viewport
+ * (animated marquees, big nowrap titles, etc.) won't let the page
+ * pan sideways on mobile.
+ */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  position: relative;
+}
+/* Marquee/ticker parents: clip their wide children */
+.ticker-stack,
+.marquee-wrap,
+.carousel-strip,
+.pp-carousel-strip,
+.footer-marquee-mega,
+.product-mark {
+  overflow: hidden !important;
+  max-width: 100vw !important;
+}
+/* Anything that uses width:max-content should be confined */
+.ticker,
+.carousel-track-inner,
+.pp-carousel-track-inner {
+  /* the parent already clips; just make sure these don't escape via transform */
+  will-change: transform;
+}
+/* Big background "ghost" texts that use translate(-50%,-50%) and white-space:nowrap */
+.statement-bg,
+.newsletter-bg,
+.eyewear-bg,
+.gallery-bg-text,
+.freq-bg {
+  max-width: 100vw;
+  pointer-events: none;
+}
+/* Hero title can't bust the viewport on mobile */
+@media (max-width: 640px) {
+  .hero-title {
+    overflow: hidden;
+    max-width: 100%;
+  }
+}
+
+
+
+/* ============ RESTRAINT PASS — toward esoteric, away from chaotic ============ */
+
+/* Quieter HUD — single small mark */
+.hud{
+  font-size:9px !important;letter-spacing:4px !important;
+  pointer-events:none;
+}
+.hud .hud-block{
+  background:transparent !important;
+  border:none !important;
+  backdrop-filter:none !important;
+  padding:0 !important;
+  color:rgba(239,233,220,.4);
+}
+.hud-mark{
+  color:var(--gold);font-size:11px;
+  display:inline-block;animation:slowSpin 24s linear infinite;
+  margin-right:8px;
+}
+@keyframes slowSpin{to{transform:rotate(360deg);}}
+@media (max-width:640px){
+  .hud{top:14px !important;left:16px !important;right:auto !important;font-size:8px !important;letter-spacing:3px !important;}
+}
+
+/* Quieter section dividers — single sigil mark, no shouty section/file labels */
+.divider-mark{
+  text-align:center;padding:32px 16px;color:var(--gold);
+  font-size:14px;letter-spacing:8px;background:var(--black);
+  position:relative;
+}
+.divider-mark::before,.divider-mark::after{
+  content:'';position:absolute;top:50%;height:1px;
+  width:64px;background:linear-gradient(to right,transparent,rgba(200,150,10,.3));
+}
+.divider-mark::before{left:50%;transform:translateX(-72px);
+  background:linear-gradient(to left,rgba(200,150,10,.3),transparent);}
+.divider-mark::after{left:50%;transform:translateX(8px);}
+
+/* Section titles: monumental, no italic stroke breaks */
+.section-title em,
+.eyewear-title em,
+.newsletter-title em,
+.info-title em,
+.specs-title em,
+.freq-quote em,
+.col-name em,
+.runway-name em,
+.stylist-name em,
+.complete-name em,
+.stat-num em,
+.hero-title em {
+  font-style:normal !important;
+  -webkit-text-stroke:0 !important;
+  color:inherit !important;
+  font-family:inherit !important;
+}
+
+/* Quiet the strike-through in statement quote */
+.statement-quote .strike{display:none;}
+
+/* Stats — half the visual weight */
+.stat-num{font-size:54px !important;letter-spacing:1px;}
+.stat-item{padding:32px 24px !important;}
+.stat-label{font-size:9px !important;letter-spacing:5px !important;color:rgba(239,233,220,.35) !important;}
+@media (max-width:640px){
+  .stat-num{font-size:36px !important;}
+  .stat-item{padding:20px 12px !important;}
+  .stat-label{font-size:8px !important;letter-spacing:3px !important;}
+}
+
+/* Section labels — one mark, less data */
+.section-label{
+  font-size:10px !important;letter-spacing:5px !important;
+  color:rgba(200,150,10,.7) !important;
+  margin-bottom:12px !important;
+}
+.section-label::before{display:none !important;}
+
+/* Manifesto — restraint pass: 3 type tones max */
+.manifesto-text p{font-style:normal;color:rgba(239,233,220,.8);font-weight:300;}
+.manifesto-text em,.manifesto-text strong{
+  font-family:'Bodoni Moda',serif !important;
+  font-style:italic !important;
+  font-weight:400 !important;
+  color:var(--gold) !important;
+  -webkit-text-stroke:0 !important;
+  font-size:1em !important;
+  display:inline !important;
+  margin:0 !important;
+}
+.manifesto-text .manifesto-statement{
+  font-family:'Anton',sans-serif;font-size:1.6em;line-height:1.05;letter-spacing:1px;
+  color:var(--cream);margin:24px 0;
+}
+.manifesto-text .manifesto-coda{
+  font-style:italic;color:rgba(239,233,220,.6);
+  font-family:'Bodoni Moda',serif;
+}
+.manifesto-text .manifesto-coda-em{color:var(--gold);}
+@media (max-width:640px){
+  .manifesto-text .manifesto-statement{font-size:1.4em !important;margin:16px 0 !important;}
+}
+
+/* Manifesto tag */
+.manifesto-tag{
+  font-size:10px !important;letter-spacing:5px !important;
+  color:var(--gold) !important;
+}
+.manifesto-tag span{display:none !important;}
+
+/* Hero title — keep RGB glitch but slow it WAY down (4x rarer) */
+@keyframes glitchR{
+  0%,98%,100%{clip-path:inset(0 0 0 0);transform:translate(0);opacity:0;}
+  98.5%{opacity:1;clip-path:inset(20% 0 60% 0);transform:translate(2px,-1px);}
+  99%{clip-path:inset(70% 0 10% 0);transform:translate(-2px,1px);}
+  99.5%{clip-path:inset(40% 0 30% 0);transform:translate(1px,0);}
+}
+@keyframes glitchB{
+  0%,98%,100%{clip-path:inset(0 0 0 0);transform:translate(0);opacity:0;}
+  98.5%{opacity:1;clip-path:inset(60% 0 10% 0);transform:translate(-2px,1px);}
+  99%{clip-path:inset(20% 0 60% 0);transform:translate(2px,-1px);}
+  99.5%{clip-path:inset(50% 0 20% 0);transform:translate(-1px,0);}
+}
+.hero-title .glitch.r,.hero-title .glitch.b{animation-duration:18s;}
+
+/* Hero meta tags - quieter */
+.hero-meta-item{font-size:9px !important;letter-spacing:3px !important;}
+.hero-meta-item b{font-size:12px !important;letter-spacing:2px !important;color:var(--gold) !important;}
+
+/* Hero eyebrow - drop the BROADCAST language */
+.hero-eyebrow{letter-spacing:5px !important;}
+
+/* Quieter ticker tracks — drop ALL the // brand outlines on duplicates */
+.ticker-item.outline{opacity:.6;}
+
+/* Quieter sticker labels (REC, CLASSIFIED, FEATURED) */
+.sticker{opacity:.7;}
+
+/* Trim the giant ghost-text background marquees on mobile - they were noise */
+@media (max-width:640px){
+  .statement-bg,.eyewear-bg,.gallery-bg-text,.newsletter-bg,.freq-bg{display:none !important;}
+}
+
+/* Stat tag (// 01 etc) - hide entirely now */
+.stat-tag{display:none !important;}
+
+/* Drop scramble effect on stat numbers and section labels — keep only on hero/title */
+/* Handled by the JS observer scoping. Add a class signal: */
+.no-scramble{}
+
+
+
+/* ============ STATS — further dial-down per feedback ============ */
+.stat-num{
+  font-size:38px !important;
+  letter-spacing:0 !important;
+  font-weight:400;
+}
+.stat-item{
+  padding:20px 16px !important;
+}
+.stat-label{
+  font-size:8px !important;
+  letter-spacing:4px !important;
+  margin-top:8px !important;
+}
+.stats-grid{
+  gap:1px !important;
+}
+@media (max-width:640px){
+  .stat-num{font-size:26px !important;}
+  .stat-item{padding:14px 10px !important;}
+  .stat-label{font-size:7px !important;letter-spacing:2.5px !important;margin-top:6px !important;}
+}
+
+/* Stats section eyebrow / heading slimmer too */
+.stats-section{padding:48px 0 !important;}
+@media (max-width:640px){
+  .stats-section{padding:32px 0 !important;}
+}
+
 </style>
+
 </head>
 <body>
 
 <!-- BOOT / CLEARANCE LOADER -->
+
 <div id="boot">
   <div class="boot-grid"></div>
   <div class="boot-frame">
@@ -1079,30 +1494,28 @@ footer{
 </div>
 
 <!-- CURSOR -->
+
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="cursor-label" id="cursorLabel"></div>
 
 <!-- OVERLAYS -->
+
 <div class="grain"></div>
 <div class="scanlines"></div>
 <div class="vignette"></div>
 
 <!-- TOP HUD -->
+
 <div class="hud">
   <div class="hud-block">
-    <span class="hud-dot live"></span>
-    <span>BROADCAST // SS25</span>
-    <span id="hudTime">00:00:00 UTC</span>
-  </div>
-  <div class="hud-block">
-    <span>LAT 40.7128°N</span>
-    <span>LNG 74.0060°W</span>
-    <span id="hudCounter">VIEWERS: 0001</span>
+    <span class="hud-mark">✦</span>
+    <span>UNKNOWN &mdash; SS25</span>
   </div>
 </div>
 
 <!-- NAV -->
+
 <nav id="nav">
   <a href="#" class="nav-logo"><span class="sigil"></span>UNKNOWN</a>
   <ul class="nav-links">
@@ -1116,6 +1529,7 @@ footer{
 </nav>
 
 <!-- HERO -->
+
 <section class="hero">
   <canvas id="hero-canvas"></canvas>
   <div class="hero-grid"></div>
@@ -1130,23 +1544,26 @@ footer{
       </h1>
     </div>
 
-    <div class="hero-meta">
-      <div class="hero-meta-item">SEASON<b>SS / 25</b></div>
-      <div class="hero-meta-item">DROP<b>NO. 004</b></div>
-      <div class="hero-meta-item">UNITS<b>LIMITED</b></div>
-    </div>
+```
+<div class="hero-meta">
+  <div class="hero-meta-item">SEASON<b>SS / 25</b></div>
+  <div class="hero-meta-item">DROP<b>NO. 004</b></div>
+  <div class="hero-meta-item">UNITS<b>LIMITED</b></div>
+</div>
 
-    <p class="hero-sub">Wear what they can't define. Built for those who move through the world unbothered, unknown, untouchable. The frequency only the few can tune into.</p>
+<p class="hero-sub">Wear what they can't define. Built for those who move through the world unbothered, unknown, untouchable. The frequency only the few can tune into.</p>
 
-    <div class="hero-actions">
-      <a href="#runway" class="btn-primary magnetic"><span>SHOP THE DROP <span class="arr">→</span></span></a>
-      <a href="#lookbook" class="btn-ghost magnetic"><span>VIEW LOOKBOOK</span></a>
-    </div>
+<div class="hero-actions">
+  <a href="#runway" class="btn-primary magnetic"><span>SHOP THE DROP <span class="arr">→</span></span></a>
+  <a href="#lookbook" class="btn-ghost magnetic"><span>VIEW LOOKBOOK</span></a>
+</div>
 
-    <div class="scroll-indicator">
-      <div class="scroll-line"></div>
-      <span class="scroll-text">SCROLL // EXPLORE</span>
-    </div>
+<div class="scroll-indicator">
+  <div class="scroll-line"></div>
+  <span class="scroll-text">SCROLL // EXPLORE</span>
+</div>
+```
+
   </div>
 
   <div class="hero-right">
@@ -1162,6 +1579,7 @@ footer{
 </section>
 
 <!-- TRIPLE TICKER -->
+
 <div class="ticker-stack">
   <div class="ticker">
     <span class="ticker-item">DROP 004 <span class="dot"></span></span>
@@ -1195,50 +1613,114 @@ footer{
   </div>
 </div>
 
+<!-- LIFESTYLE CAROUSEL -->
+
+<div class="carousel-strip" id="lifestyleStrip">
+  <div class="carousel-strip-label">
+    <span><span class="pulse-dot"></span>// IN ROTATION / <b>LIFESTYLE</b></span>
+    <span>SCROLL // PAUSE ON HOVER</span>
+  </div>
+  <div class="carousel-track">
+    <div class="carousel-track-inner" id="lifestyleTrackA">
+      <div class="carousel-item" data-tag="// 02"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls1" alt=""></div>
+      <div class="carousel-item" data-tag="// 06"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls2" alt=""></div>
+      <div class="carousel-item" data-tag="// 11"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls3" alt=""></div>
+      <div class="carousel-item" data-tag="// 19"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls4" alt=""></div>
+      <div class="carousel-item" data-tag="// 28"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls5" alt=""></div>
+      <div class="carousel-item" data-tag="// 42"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls6" alt=""></div>
+      <div class="carousel-item" data-tag="// 47"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls7" alt=""></div>
+      <div class="carousel-item" data-tag="// 64"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls8" alt=""></div>
+      <div class="carousel-item" data-tag="// 67"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls9" alt=""></div>
+      <div class="carousel-item" data-tag="// 72"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls10" alt=""></div>
+      <!-- duplicate for seamless loop -->
+      <div class="carousel-item" data-tag="// 02"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls1" alt=""></div>
+      <div class="carousel-item" data-tag="// 06"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls2" alt=""></div>
+      <div class="carousel-item" data-tag="// 11"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls3" alt=""></div>
+      <div class="carousel-item" data-tag="// 19"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls4" alt=""></div>
+      <div class="carousel-item" data-tag="// 28"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls5" alt=""></div>
+      <div class="carousel-item" data-tag="// 42"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls6" alt=""></div>
+      <div class="carousel-item" data-tag="// 47"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls7" alt=""></div>
+      <div class="carousel-item" data-tag="// 64"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls8" alt=""></div>
+      <div class="carousel-item" data-tag="// 67"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls9" alt=""></div>
+      <div class="carousel-item" data-tag="// 72"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ls10" alt=""></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT CAROUSEL -->
+
+<div class="carousel-strip" id="productStrip">
+  <div class="carousel-strip-label">
+    <span><span class="pulse-dot"></span>// CATALOG / <b>PRODUCT</b></span>
+    <span>SS25 / DROP 004</span>
+  </div>
+  <div class="carousel-track">
+    <div class="carousel-track-inner reverse" id="productTrackA">
+      <div class="carousel-item product" data-tag="// BLACK GOLD"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps1" alt=""></div>
+      <div class="carousel-item product" data-tag="// MULTI"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps2" alt=""></div>
+      <div class="carousel-item product" data-tag="// YELLOW"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps3" alt=""></div>
+      <div class="carousel-item product" data-tag="// MULTI / FOLDED"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps4" alt=""></div>
+      <div class="carousel-item product" data-tag="// GREEN"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps5" alt=""></div>
+      <div class="carousel-item product" data-tag="// VISOR"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps6" alt=""></div>
+      <div class="carousel-item product" data-tag="// YELLOW / DETAIL"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps7" alt=""></div>
+      <div class="carousel-item product" data-tag="// BLACK GOLD"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps8" alt=""></div>
+      <!-- dupe -->
+      <div class="carousel-item product" data-tag="// BLACK GOLD"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps1" alt=""></div>
+      <div class="carousel-item product" data-tag="// MULTI"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps2" alt=""></div>
+      <div class="carousel-item product" data-tag="// YELLOW"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps3" alt=""></div>
+      <div class="carousel-item product" data-tag="// MULTI / FOLDED"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps4" alt=""></div>
+      <div class="carousel-item product" data-tag="// GREEN"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps5" alt=""></div>
+      <div class="carousel-item product" data-tag="// VISOR"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps6" alt=""></div>
+      <div class="carousel-item product" data-tag="// YELLOW / DETAIL"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps7" alt=""></div>
+      <div class="carousel-item product" data-tag="// BLACK GOLD"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="ps8" alt=""></div>
+    </div>
+  </div>
+</div>
+
 <!-- STATS -->
+
 <div class="section-stats">
   <div class="stat-item">
-    <span class="stat-tag">// 01</span>
-    <span class="stat-num" data-count="4">0<em>0</em>4</span>
-    <span class="stat-label">Drops Released</span>
+    <span class="stat-num">004</span>
+    <span class="stat-label">DROPS</span>
   </div>
   <div class="stat-item">
-    <span class="stat-tag">// 02</span>
-    <span class="stat-num">50<em>K</em>+</span>
-    <span class="stat-label">Units in the Wild</span>
+    <span class="stat-num">50K+</span>
+    <span class="stat-label">IN ROTATION</span>
   </div>
   <div class="stat-item">
-    <span class="stat-tag">// 03</span>
-    <span class="stat-num">12<em>+</em></span>
-    <span class="stat-label">Colorways Released</span>
+    <span class="stat-num">12+</span>
+    <span class="stat-label">COLORWAYS</span>
   </div>
   <div class="stat-item">
-    <span class="stat-tag">// 04</span>
     <span class="stat-num">∞</span>
-    <span class="stat-label">The Unknown</span>
+    <span class="stat-label">UNKNOWN</span>
   </div>
 </div>
 
 <!-- MANIFESTO -->
+
 <section class="section-manifesto">
   <div class="manifesto-grid">
-    <div class="manifesto-tag">[ MANIFESTO ]<span>FILE / 04.MFTO</span></div>
+    <div class="manifesto-tag">✦ MANIFESTO</div>
     <div class="manifesto-text">
-      <p>This isn't fashion. It's a <em>frequency</em> — broadcast on a wavelength most can't hear. <span class="manifesto-redact">█████████████████</span> built for those who refuse to be filed, tagged, or sorted.</p>
-      <p><strong class="gold">DRESSED IN DEFIANCE.</strong> Every stitch a refusal. Every drop a coordinate point on a map nobody else can read.</p>
-      <p>You don't <em>discover</em> Unknown. It finds <span class="red">you.</span></p>
+      <p>This isn&rsquo;t fashion. It&rsquo;s a frequency &mdash; broadcast on a wavelength most can&rsquo;t hear. Built for those who refuse to be filed, tagged, or sorted.</p>
+      <p class="manifesto-statement">DRESSED IN DEFIANCE</p>
+      <p>Every stitch a refusal. Every drop a coordinate on a map nobody else can read.</p>
+      <p class="manifesto-coda">You don&rsquo;t discover Unknown. <span class="manifesto-coda-em">It finds you.</span></p>
     </div>
   </div>
 </section>
 
-<div class="divider-fancy"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 02 / COLLECTIONS</div>
+<div class="divider-mark">✦</div>
 
 <!-- COLLECTIONS -->
+
 <section class="section-collections" id="collections">
   <div class="section-header">
     <div>
-      <p class="section-label">DROP 004 // 05 PIECES</p>
-      <h2 class="section-title">COLL<em>ECT</em>IONS<span class="num">/ 02</span></h2>
+      <p class="section-label">✦ DROP 004 — FIVE PIECES</p>
+      <h2 class="section-title">COLLECTIONS </h2>
     </div>
     <a href="#" class="section-link">View All
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M13 7L7 1M13 7L7 13" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -1253,7 +1735,7 @@ footer{
       <div class="col-card-overlay-line"></div>
       <div class="col-card-info">
         <span class="col-tag">★ SIGNATURE</span>
-        <h3 class="col-name">BLACK<em>&</em>GOLD<br>HOODIE SET</h3>
+        <h3 class="col-name">BLACK &amp; GOLD<br>HOODIE SET</h3>
         <div class="col-meta">
           <span>FROM <b>$148</b></span>
           <span>SS25 / 5 COLORS</span>
@@ -1261,59 +1743,63 @@ footer{
       </div>
     </a>
 
-    <a href="product-yellow.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
-      <div class="col-card-corner"><span class="square"></span>YL.002</div>
-      <div class="col-card-num">02</div>
-      <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col2" alt="Yellow Patterned"></div>
-      <div class="col-card-overlay-line"></div>
-      <div class="col-card-info">
-        <span class="col-tag">PATTERNED</span>
-        <h3 class="col-name">YELLOW<br><em>PATTERNED</em></h3>
-        <div class="col-meta"><span><b>$128</b></span><span>SS25</span></div>
-      </div>
-    </a>
+```
+<a href="product-yellow.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
+  <div class="col-card-corner"><span class="square"></span>YL.002</div>
+  <div class="col-card-num">02</div>
+  <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col2" alt="Yellow Patterned"></div>
+  <div class="col-card-overlay-line"></div>
+  <div class="col-card-info">
+    <span class="col-tag">PATTERNED</span>
+    <h3 class="col-name">YELLOW<br>PATTERNED</h3>
+    <div class="col-meta"><span><b>$128</b></span><span>SS25</span></div>
+  </div>
+</a>
 
-    <a href="product-green.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
-      <div class="col-card-corner"><span class="square"></span>GR.003</div>
-      <div class="col-card-num">03</div>
-      <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col3" alt="Green Design"></div>
-      <div class="col-card-overlay-line"></div>
-      <div class="col-card-info">
-        <span class="col-tag">DESIGN</span>
-        <h3 class="col-name">GREEN<br><em>DESIGN</em></h3>
-        <div class="col-meta"><span><b>$138</b></span><span>SS25</span></div>
-      </div>
-    </a>
+<a href="product-green.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
+  <div class="col-card-corner"><span class="square"></span>GR.003</div>
+  <div class="col-card-num">03</div>
+  <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col3" alt="Green Design"></div>
+  <div class="col-card-overlay-line"></div>
+  <div class="col-card-info">
+    <span class="col-tag">DESIGN</span>
+    <h3 class="col-name">GREEN<br>DESIGN</h3>
+    <div class="col-meta"><span><b>$138</b></span><span>SS25</span></div>
+  </div>
+</a>
 
-    <a href="product-multicolor.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
-      <div class="col-card-corner"><span class="square"></span>MC.004</div>
-      <div class="col-card-num">04</div>
-      <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col4" alt="Multi Color"></div>
-      <div class="col-card-overlay-line"></div>
-      <div class="col-card-info">
-        <span class="col-tag">★ CAPSULE</span>
-        <h3 class="col-name">MULTI<em>—</em>COLOR</h3>
-        <div class="col-meta"><span><b>$148</b></span><span>SS25</span></div>
-      </div>
-    </a>
+<a href="product-multicolor.html" class="col-card tilt" style="text-decoration:none;color:inherit;display:block;">
+  <div class="col-card-corner"><span class="square"></span>MC.004</div>
+  <div class="col-card-num">04</div>
+  <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col4" alt="Multi Color"></div>
+  <div class="col-card-overlay-line"></div>
+  <div class="col-card-info">
+    <span class="col-tag">★ CAPSULE</span>
+    <h3 class="col-name">MULTI — COLOR</h3>
+    <div class="col-meta"><span><b>$148</b></span><span>SS25</span></div>
+  </div>
+</a>
 
-    <div class="col-card tilt">
-      <div class="col-card-corner"><span class="square"></span>HT.005</div>
-      <div class="col-card-num">05</div>
-      <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col5" alt="Red"></div>
-      <div class="col-card-overlay-line"></div>
-      <div class="col-card-info">
-        <span class="col-tag">HEAT</span>
-        <h3 class="col-name">RED<br><em>UNKNOWN</em></h3>
-        <div class="col-meta"><span><b>$78</b></span><span>SS25</span></div>
-      </div>
-    </div>
+<div class="col-card tilt">
+  <div class="col-card-corner"><span class="square"></span>HT.005</div>
+  <div class="col-card-num">05</div>
+  <div class="img-wrap"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="col5" alt="Red"></div>
+  <div class="col-card-overlay-line"></div>
+  <div class="col-card-info">
+    <span class="col-tag">HEAT</span>
+    <h3 class="col-name">RED<br>UNKNOWN</h3>
+    <div class="col-meta"><span><b>$78</b></span><span>SS25</span></div>
+  </div>
+</div>
+```
+
   </div>
 </section>
 
 <div class="divider-line"></div>
 
 <!-- STATEMENT -->
+
 <section class="section-statement">
   <div class="statement-bg">UNKNOWN</div>
   <div class="statement-images">
@@ -1328,22 +1814,23 @@ footer{
     </div>
   </div>
   <div class="statement-content">
-    <p class="section-label">// PHILOSOPHY / 03</p>
-    <h2 class="statement-quote">DRESSED IN<br><em>DEFIANCE.</em><br>BUILT ON <span class="strike">FIRE</span> FREQUENCY.</h2>
+    <p class="section-label">✦ PHILOSOPHY</p>
+    <h2 class="statement-quote">DRESSED IN<br>DEFIANCE.<br>BUILT ON FREQUENCY.</h2>
     <p class="statement-body">Every piece carries the weight of those who refuse to be defined. UNKNOWN isn't a brand — it's <em>a frequency</em>. Worn by the ones who operate in the space between known and undiscovered.</p>
     <div class="statement-sig">FROM THE ARCHIVES // 2025</div>
     <a href="#runway" class="btn-primary magnetic"><span>EXPLORE THE WORLD <span class="arr">→</span></span></a>
   </div>
 </section>
 
-<div class="divider-fancy"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 04 / RUNWAY</div>
+<div class="divider-mark">✦</div>
 
 <!-- RUNWAY (horizontal scroll) -->
+
 <section class="section-runway" id="runway">
   <div class="runway-header">
     <div>
-      <p class="section-label">// LATEST DROP / FULL CATALOG</p>
-      <h2 class="section-title">RUN<em>WAY</em><span class="num">/ 04</span></h2>
+      <p class="section-label">✦ LATEST DROP</p>
+      <h2 class="section-title">RUNWAY </h2>
     </div>
     <a href="#" class="section-link">Full Catalog
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M13 7L7 1M13 7L7 13" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -1424,12 +1911,13 @@ footer{
 <div class="divider-line"></div>
 
 <!-- EYEWEAR -->
+
 <section class="section-eyewear" id="eyewear">
   <div class="eyewear-circle"></div>
   <div class="eyewear-bg">VISION</div>
   <div class="eyewear-content">
     <p class="eyewear-label">// SIGNATURE / 03.001</p>
-    <h2 class="eyewear-title">UNK<em>NOWN</em><br>EYEWEAR</h2>
+    <h2 class="eyewear-title">UNKNOWN<br>EYEWEAR</h2>
     <p class="eyewear-desc">The visor that started it all. Oversized shield lenses. Gold hardware. <em>"UNKNOWN"</em> across the lens — because what you don't show is always more powerful than what you do.</p>
     <a href="#" class="btn-dark magnetic"><span>SHOP EYEWEAR →</span></a>
   </div>
@@ -1440,14 +1928,15 @@ footer{
   </div>
 </section>
 
-<div class="divider-fancy"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 06 / LOOKBOOK</div>
+<div class="divider-mark">✦</div>
 
 <!-- LOOKBOOK -->
+
 <section class="section-lookbook" id="lookbook">
   <div class="lookbook-header">
     <div>
-      <p class="section-label">// THE WORLD OF UNKNOWN</p>
-      <h2 class="section-title">LOOK<em>BOOK</em><span class="num">/ 06</span></h2>
+      <p class="section-label">✦ THE WORLD OF UNKNOWN</p>
+      <h2 class="section-title">LOOKBOOK </h2>
     </div>
     <a href="#" class="section-link">See All Looks
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M13 7L7 1M13 7L7 13" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -1468,11 +1957,12 @@ footer{
 <div class="divider-line"></div>
 
 <!-- NEWSLETTER -->
+
 <section class="section-newsletter" id="newsletter">
   <div class="newsletter-bg layer2">JOIN</div>
   <div class="newsletter-bg">JOIN</div>
   <p class="newsletter-pretitle">FREQUENCY ENROLLMENT</p>
-  <h2 class="newsletter-title">STAY<br><em>UNKNOWN</em></h2>
+  <h2 class="newsletter-title">STAY<br>UNKNOWN</h2>
   <p class="newsletter-sub">Drop alerts, classified access, advance coordinates. Nothing else, ever. <em>You're either on the frequency or you're not.</em></p>
   <div class="newsletter-form">
     <input type="email" placeholder="ENTER YOUR EMAIL ADDRESS">
@@ -1482,6 +1972,7 @@ footer{
 </section>
 
 <!-- FOOTER -->
+
 <footer>
   <div class="footer-marquee-mega">
     <span>UNKNOWN</span><span class="solid">★</span><span>UNKNOWN</span><span class="solid">★</span><span>UNKNOWN</span><span class="solid">★</span><span>UNKNOWN</span><span class="solid">★</span>
@@ -1581,6 +2072,28 @@ const IMG = {
   look6:       { pool: 'lifestyle', n: 64 },   // shades + style
   look7:       { pool: 'lifestyle', n: 75 },   // moody close
   look8:       { pool: 'lifestyle', n: 51 },   // green sweater wear
+
+  // ─── LIFESTYLE CAROUSEL (10 photos, auto-scrolls) ───
+  ls1:         { pool: 'lifestyle', n: 2  },
+  ls2:         { pool: 'lifestyle', n: 6  },
+  ls3:         { pool: 'lifestyle', n: 11 },
+  ls4:         { pool: 'lifestyle', n: 19 },
+  ls5:         { pool: 'lifestyle', n: 28 },
+  ls6:         { pool: 'lifestyle', n: 42 },
+  ls7:         { pool: 'lifestyle', n: 47 },
+  ls8:         { pool: 'lifestyle', n: 64 },
+  ls9:         { pool: 'lifestyle', n: 67 },
+  ls10:        { pool: 'lifestyle', n: 72 },
+
+  // ─── PRODUCT CAROUSEL (8 hero product shots) ───
+  ps1:         { pool: 'blackyellow', f: 'black_&_yellow_hero.webp' },
+  ps2:         { pool: 'multicolor',  f: 'multi_solo_01_result.webp' },
+  ps3:         { pool: 'yellow',      f: 'yellow_product_01.webp' },
+  ps4:         { pool: 'multicolor',  f: 'multi_solo_03_result.webp' },
+  ps5:         { pool: 'green',       f: 'green_sweatshirt_solo.webp' },
+  ps6:         { pool: 'apparel',     n: 14 },
+  ps7:         { pool: 'yellow',      f: 'yellow_product_detail.webp' },
+  ps8:         { pool: 'blackyellow', f: 'black_&_yellow_product_01.webp' },
 };
 
 function imgURL(slot) {
@@ -1865,11 +2378,9 @@ const scrambleObserver = new IntersectionObserver(entries => {
     }
   });
 }, {threshold:0.3});
-document.querySelectorAll('.col-name, .runway-name, .stat-num, .manifesto-text strong').forEach(el => {
-  if(el.children.length === 0 || el.querySelector('em, br')){
-    el._scramble = new Scramble(el);
-    scrambleObserver.observe(el);
-  }
+document.querySelectorAll('.runway-name').forEach(el => {
+  el._scramble = new Scramble(el);
+  scrambleObserver.observe(el);
 });
 
 /* ============ COL CARDS REVEAL ============ */
@@ -1908,5 +2419,6 @@ if (window.matchMedia('(max-width: 640px)').matches) {
   if(c) c.style.display='none';
 }
 </script>
+
 </body>
 </html>
