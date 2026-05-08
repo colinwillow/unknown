@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YELLOW PATTERNED — UNKNOWN / SS25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold:#C8960A;
+  --gold-hot:#FFC83A;
+  --gold-dim:#6E4F00;
+  --black:#050504;
+  --off:#0B0A08;
+  --paper:#EFE9DC;
+  --cream:#F4EFE3;
+  --blood:#C8281C;
+  --acid:#D8FF3A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;background:var(--black);}
+body{
+  background:var(--black);color:var(--cream);
+  font-family:'Bodoni Moda',serif;
+  overflow-x:hidden;cursor:none;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ======= CURSOR / GRAIN / SCANLINES ======= */
+.cursor-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);mix-blend-mode:difference;
+  transition:width .25s,height .25s;}
+.cursor-ring{width:36px;height:36px;border:1px solid var(--gold);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:width .35s,height .35s,border-color .25s;}
+.cursor-label{position:fixed;pointer-events:none;z-index:9999;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:var(--gold);text-transform:uppercase;
+  padding:6px 10px;background:rgba(5,5,4,.85);border:1px solid rgba(200,150,10,.4);
+  transform:translate(20px,20px);opacity:0;transition:opacity .2s;white-space:nowrap;}
+.cursor-label.show{opacity:1;}
+body.hovering .cursor-ring{width:64px;height:64px;border-color:var(--gold-hot);}
+body.hovering .cursor-dot{width:0;height:0;}
+body.dragging .cursor-ring{width:96px;height:96px;border:2px solid var(--gold-hot);background:rgba(200,150,10,.08);}
+
+.grain{position:fixed;inset:-50%;width:200%;height:200%;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.78  0 0 0 0 0.59  0 0 0 0 0.04  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
+  pointer-events:none;z-index:9000;opacity:.16;
+  animation:grain .6s steps(4) infinite;mix-blend-mode:overlay;}
+@keyframes grain{0%{transform:translate(0,0);}25%{transform:translate(-2%,3%);}50%{transform:translate(3%,-2%);}75%{transform:translate(-1%,1%);}100%{transform:translate(0,0);}}
+
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:8999;
+  background:repeating-linear-gradient(180deg,transparent 0,transparent 2px,rgba(0,0,0,.18) 3px,transparent 4px);
+  opacity:.22;mix-blend-mode:multiply;}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:8998;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.65) 100%);}
+
+/* ======= TOP HUD ======= */
+.hud{position:fixed;top:16px;left:16px;right:16px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:rgba(239,233,220,.5);z-index:550;pointer-events:none;text-transform:uppercase;}
+.hud-block{display:flex;gap:24px;align-items:center;background:rgba(5,5,4,.4);
+  backdrop-filter:blur(8px);padding:6px 12px;border:1px solid rgba(200,150,10,.12);}
+.hud-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:blink 1.4s infinite;}
+.hud-dot.live{background:var(--blood);}
+@keyframes blink{50%{opacity:0;}}
+
+/* ======= NAV ======= */
+nav{position:fixed;top:48px;left:0;right:0;z-index:500;
+  padding:18px 32px;display:flex;align-items:center;justify-content:space-between;
+  transition:background .4s,border-color .4s,padding .3s;
+  border-bottom:1px solid transparent;}
+nav.scrolled{background:rgba(5,5,4,.82);backdrop-filter:blur(14px) saturate(1.4);
+  border-bottom:1px solid rgba(200,150,10,.18);padding:14px 32px;}
+.nav-logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:6px;
+  color:var(--cream);text-decoration:none;display:flex;align-items:center;gap:10px;}
+.nav-logo .sigil{width:18px;height:18px;background:var(--gold);
+  clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%);
+  animation:spin 8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:rgba(239,233,220,.7);text-decoration:none;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;transition:color .2s,gap .2s;}
+.nav-back:hover{color:var(--gold);gap:12px;}
+.nav-cart{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:var(--gold);text-decoration:none;border:1px solid rgba(200,150,10,.4);
+  padding:8px 14px;text-transform:uppercase;cursor:none;background:rgba(5,5,4,.5);
+  display:flex;gap:8px;align-items:center;}
+.nav-cart:hover{background:var(--gold);color:var(--black);}
+.nav-cart .count{background:var(--blood);color:var(--cream);padding:2px 6px;font-size:10px;}
+
+/* ======= BREADCRUMB ======= */
+.breadcrumb{padding:140px 56px 0;font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:3px;color:rgba(239,233,220,.4);text-transform:uppercase;
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.breadcrumb a{color:rgba(239,233,220,.5);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:var(--gold);}
+.breadcrumb .sep{color:var(--gold);}
+.breadcrumb .current{color:var(--gold);}
+
+/* ======= HEADER MARK ======= */
+.product-mark{padding:24px 56px 8px;
+  font-family:'Anton',sans-serif;font-size:clamp(80px,11vw,160px);
+  letter-spacing:-2px;line-height:.85;
+  color:transparent;-webkit-text-stroke:1px rgba(200,150,10,.18);
+  white-space:nowrap;overflow:hidden;}
+.product-mark span{display:inline-block;animation:slideMark 22s linear infinite;}
+@keyframes slideMark{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ======= MAIN PRODUCT GRID ======= */
+.product-main{
+  display:grid;grid-template-columns:1.15fr 1fr;
+  gap:0;padding:0 56px;position:relative;
+  border-top:1px solid rgba(200,150,10,.1);
+}
+.product-gallery{
+  position:relative;border-right:1px solid rgba(200,150,10,.1);
+}
+.gallery-frame{
+  position:sticky;top:140px;
+  height:calc(100vh - 160px);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:var(--off);
+}
+.gallery-bg-text{position:absolute;font-family:'Anton',sans-serif;
+  font-size:clamp(140px,18vw,280px);letter-spacing:-8px;line-height:.85;
+  color:transparent;-webkit-text-stroke:1px rgba(200,150,10,.05);
+  z-index:1;white-space:nowrap;animation:bgDrift 30s ease-in-out infinite alternate;}
+@keyframes bgDrift{from{transform:translateX(-10%);}to{transform:translateX(10%);}}
+.gallery-img-stage{
+  position:relative;width:80%;height:80%;display:flex;align-items:center;justify-content:center;
+  z-index:2;perspective:1500px;
+}
+.gallery-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .6s;
+}
+.gallery-img.active{opacity:1;}
+.gallery-img img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,.6));
+  transition:transform .15s ease-out;
+  cursor:none;
+}
+.gallery-corner{position:absolute;width:18px;height:18px;border:1px solid var(--gold);z-index:5;}
+.gallery-corner.tl{top:24px;left:24px;border-right:none;border-bottom:none;}
+.gallery-corner.tr{top:24px;right:24px;border-left:none;border-bottom:none;}
+.gallery-corner.bl{bottom:24px;left:24px;border-right:none;border-top:none;}
+.gallery-corner.br{bottom:24px;right:24px;border-left:none;border-top:none;}
+
+.gallery-meta{position:absolute;bottom:24px;left:24px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:rgba(239,233,220,.4);z-index:5;text-transform:uppercase;}
+.gallery-meta b{color:var(--gold);font-weight:400;}
+
+.gallery-zoom-hint{position:absolute;bottom:24px;right:24px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:rgba(239,233,220,.4);z-index:5;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;}
+.gallery-zoom-hint::before{content:'';width:24px;height:24px;border:1px solid currentColor;
+  border-radius:50%;display:inline-block;
+  background:radial-gradient(circle at center,currentColor 1px,transparent 2px);}
+
+.gallery-thumbs{position:absolute;left:24px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px;z-index:5;}
+.gallery-thumb{width:48px;height:60px;border:1px solid rgba(200,150,10,.3);
+  cursor:none;overflow:hidden;background:var(--black);
+  transition:border-color .25s,transform .25s;position:relative;}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;opacity:.6;transition:opacity .25s;}
+.gallery-thumb:hover{border-color:var(--gold);transform:translateX(4px);}
+.gallery-thumb:hover img,.gallery-thumb.active img{opacity:1;}
+.gallery-thumb.active{border-color:var(--gold);}
+.gallery-thumb.active::after{content:'';position:absolute;left:-4px;top:0;bottom:0;width:2px;background:var(--gold);}
+
+/* product info side */
+.product-info{padding:80px 0 80px 56px;position:relative;}
+.info-header{margin-bottom:32px;}
+.info-tag{display:inline-flex;align-items:center;gap:10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;
+  border:1px solid var(--gold);padding:5px 10px;margin-bottom:24px;}
+.info-tag .star{color:var(--blood);}
+.info-title{font-family:'Anton',sans-serif;font-size:clamp(48px,5.5vw,84px);
+  line-height:.92;letter-spacing:-1px;color:var(--cream);margin-bottom:20px;text-transform:uppercase;}
+.info-title em{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:400;
+  -webkit-text-stroke:1.5px var(--gold);color:transparent;}
+.info-sub{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:rgba(239,233,220,.45);text-transform:uppercase;
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.info-sub .div{width:14px;height:1px;background:rgba(200,150,10,.4);}
+.info-sub b{color:var(--gold-hot);font-weight:400;}
+
+.price-block{
+  display:flex;align-items:baseline;gap:18px;margin:32px 0 12px;
+  padding:24px 0;border-top:1px solid rgba(200,150,10,.15);
+  border-bottom:1px solid rgba(200,150,10,.15);
+}
+.price{font-family:'Anton',sans-serif;font-size:54px;letter-spacing:1px;color:var(--gold);}
+.price .cents{font-size:24px;color:rgba(200,150,10,.6);vertical-align:top;margin-left:2px;}
+.price-old{font-family:'JetBrains Mono',monospace;font-size:14px;
+  color:rgba(239,233,220,.35);text-decoration:line-through;}
+.price-installments{margin-left:auto;font-family:'Bodoni Moda',serif;font-style:italic;
+  font-size:13px;color:rgba(239,233,220,.55);}
+.price-installments b{color:var(--gold);font-weight:400;}
+
+/* stock counter */
+.stock-row{display:flex;justify-content:space-between;align-items:center;margin:20px 0;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:rgba(239,233,220,.5);text-transform:uppercase;}
+.stock-bar{flex:1;margin:0 16px;height:2px;background:rgba(200,150,10,.15);position:relative;overflow:hidden;}
+.stock-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(to right,var(--gold-hot),var(--blood));width:18%;}
+.stock-fill::after{content:'';position:absolute;right:-4px;top:-3px;bottom:-3px;width:2px;background:var(--blood);box-shadow:0 0 8px var(--blood);}
+.stock-num b{color:var(--blood);font-weight:400;font-size:13px;}
+
+/* short desc */
+.info-desc{font-family:'Bodoni Moda',serif;font-size:16px;line-height:1.85;
+  color:rgba(239,233,220,.7);margin:24px 0 36px;max-width:540px;}
+.info-desc em{font-style:italic;color:var(--gold);}
+
+/* color swatches */
+.option-block{margin-bottom:28px;}
+.option-label{display:flex;justify-content:space-between;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;
+  color:rgba(239,233,220,.55);text-transform:uppercase;margin-bottom:14px;}
+.option-label b{color:var(--gold);font-weight:400;}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;}
+.swatch{width:46px;height:46px;border:1px solid rgba(200,150,10,.25);
+  cursor:none;position:relative;background:var(--black);transition:border-color .25s;}
+.swatch::before{content:'';position:absolute;inset:5px;}
+.swatch[data-color="black-gold"]::before{background:linear-gradient(135deg,#0a0a08 50%,var(--gold) 50%);}
+.swatch[data-color="all-black"]::before{background:#0a0a08;}
+.swatch[data-color="cream"]::before{background:var(--cream);}
+.swatch[data-color="blood"]::before{background:var(--blood);}
+.swatch[data-color="acid"]::before{background:var(--acid);}
+.swatch:hover{border-color:var(--gold);}
+.swatch.active{border-color:var(--gold-hot);}
+.swatch.active::after{content:'';position:absolute;inset:-4px;border:1px solid var(--gold-hot);}
+
+/* size keypad */
+.size-pad{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
+.size-btn{aspect-ratio:1.4/1;border:1px solid rgba(200,150,10,.25);
+  background:transparent;color:var(--cream);
+  font-family:'Anton',sans-serif;font-size:14px;letter-spacing:2px;
+  cursor:none;transition:all .2s;position:relative;overflow:hidden;}
+.size-btn::before{content:'';position:absolute;inset:0;background:var(--gold);
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.7,0,.3,1);z-index:0;}
+.size-btn span{position:relative;z-index:1;}
+.size-btn:hover::before{transform:translateY(0);}
+.size-btn:hover{color:var(--black);border-color:var(--gold);}
+.size-btn.active{background:var(--gold);color:var(--black);border-color:var(--gold);}
+.size-btn.oos{color:rgba(239,233,220,.2);border-color:rgba(200,150,10,.08);
+  cursor:not-allowed;text-decoration:line-through;}
+.size-btn.oos:hover::before{display:none;}
+
+.size-guide-link{display:inline-flex;gap:6px;font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:2px;color:var(--gold);
+  text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--gold-dim);
+  margin-top:14px;padding-bottom:2px;transition:color .2s,border-color .2s;}
+.size-guide-link:hover{color:var(--gold-hot);border-color:var(--gold-hot);}
+
+/* qty + add to bag */
+.purchase-row{display:flex;gap:8px;margin-top:32px;}
+.qty-control{display:flex;align-items:center;border:1px solid rgba(200,150,10,.3);}
+.qty-btn{width:48px;height:60px;background:transparent;border:none;color:var(--gold);
+  font-family:'Anton',sans-serif;font-size:20px;cursor:none;transition:background .2s;}
+.qty-btn:hover{background:rgba(200,150,10,.08);}
+.qty-display{width:50px;text-align:center;font-family:'Anton',sans-serif;
+  font-size:24px;color:var(--cream);border-left:1px solid rgba(200,150,10,.15);
+  border-right:1px solid rgba(200,150,10,.15);height:60px;display:flex;align-items:center;justify-content:center;}
+
+.add-to-bag{flex:1;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:5px;
+  background:var(--gold);color:var(--black);border:none;cursor:none;
+  height:60px;position:relative;overflow:hidden;
+  clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);}
+.add-to-bag::before{content:'';position:absolute;inset:0;background:var(--gold-hot);
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.7,0,.3,1);}
+.add-to-bag span{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;}
+.add-to-bag:hover::before{transform:translateY(0);}
+.add-to-bag .arr{transition:transform .3s;}
+.add-to-bag:hover .arr{transform:translateX(6px);}
+.add-to-bag.adding{background:var(--blood);color:var(--cream);}
+.add-to-bag.adding::before{display:none;}
+
+.wishlist-btn{width:60px;height:60px;border:1px solid rgba(200,150,10,.3);
+  background:transparent;cursor:none;transition:all .25s;
+  display:flex;align-items:center;justify-content:center;color:var(--gold);}
+.wishlist-btn:hover{border-color:var(--gold);background:rgba(200,150,10,.05);}
+.wishlist-btn.active{background:var(--blood);border-color:var(--blood);color:var(--cream);}
+.wishlist-btn svg{width:18px;height:18px;}
+
+/* trust badges row */
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:36px 0 0;
+  border-top:1px solid rgba(200,150,10,.15);padding-top:20px;}
+.trust-item{display:flex;flex-direction:column;gap:4px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;
+  color:rgba(239,233,220,.4);text-transform:uppercase;border-right:1px solid rgba(200,150,10,.08);
+  padding-right:14px;}
+.trust-item:last-child{border-right:none;}
+.trust-item b{color:var(--gold);font-weight:400;font-size:11px;letter-spacing:3px;}
+.trust-item svg{width:14px;height:14px;color:var(--gold);margin-bottom:6px;}
+
+/* ======= TECH SPECS ======= */
+.section-divider{padding:24px 56px;background:var(--black);
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;
+  display:flex;align-items:center;gap:14px;
+  border-top:1px solid rgba(200,150,10,.1);
+  border-bottom:1px solid rgba(200,150,10,.1);}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;
+  background:rgba(200,150,10,.18);}
+.section-divider svg{width:14px;height:14px;color:var(--gold);}
+
+.section-specs{padding:120px 56px;background:var(--black);
+  display:grid;grid-template-columns:1fr 2fr;gap:64px;align-items:start;
+  position:relative;}
+.specs-title{font-family:'Anton',sans-serif;font-size:clamp(56px,6.5vw,100px);
+  line-height:.88;letter-spacing:-1px;color:var(--cream);
+  position:sticky;top:140px;}
+.specs-title em{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:400;
+  -webkit-text-stroke:1.5px var(--gold);color:transparent;}
+.specs-title .num{font-family:'JetBrains Mono',monospace;font-size:11px;
+  letter-spacing:3px;color:var(--gold);display:block;margin-bottom:14px;}
+
+.specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.spec-row{padding:24px 0;border-bottom:1px solid rgba(200,150,10,.08);
+  display:flex;flex-direction:column;gap:6px;}
+.spec-row.full{grid-column:1/3;padding-right:32px;}
+.spec-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;
+  color:rgba(239,233,220,.4);text-transform:uppercase;}
+.spec-value{font-family:'Bodoni Moda',serif;font-size:18px;color:var(--cream);}
+.spec-value em{font-style:italic;color:var(--gold);}
+.spec-value .small{font-size:11px;color:rgba(239,233,220,.4);
+  font-family:'JetBrains Mono',monospace;letter-spacing:2px;
+  text-transform:uppercase;display:block;margin-top:2px;}
+
+/* care diagram */
+.care-grid{grid-column:1/3;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  padding:24px 0;border-bottom:1px solid rgba(200,150,10,.08);}
+.care-icon{display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:18px 8px;border:1px solid rgba(200,150,10,.12);
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;
+  color:rgba(239,233,220,.5);text-transform:uppercase;text-align:center;
+  transition:border-color .25s,background .25s;}
+.care-icon:hover{border-color:var(--gold);background:rgba(200,150,10,.05);}
+.care-icon svg{width:36px;height:36px;color:var(--gold);}
+
+/* ======= FREQUENCY (story) ======= */
+.section-frequency{padding:140px 56px;background:linear-gradient(180deg,var(--black),var(--off));
+  position:relative;overflow:hidden;border-top:1px solid rgba(200,150,10,.08);}
+.freq-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Anton',sans-serif;font-size:clamp(220px,28vw,420px);
+  color:transparent;-webkit-text-stroke:1px rgba(200,40,28,.05);
+  letter-spacing:-12px;line-height:.85;pointer-events:none;user-select:none;
+  white-space:nowrap;}
+.freq-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:80px;
+  position:relative;z-index:2;align-items:center;}
+.freq-image{height:680px;overflow:hidden;position:relative;}
+.freq-image img{width:100%;height:100%;object-fit:cover;object-position:center top;
+  filter:contrast(1.12) saturate(.9);transition:transform 1.2s;}
+.freq-image:hover img{transform:scale(1.05);}
+.freq-image::after{content:attr(data-tag);
+  position:absolute;bottom:14px;left:14px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--gold);background:rgba(5,5,4,.85);padding:4px 8px;
+  border:1px solid rgba(200,150,10,.4);text-transform:uppercase;}
+
+.freq-content{position:relative;}
+.freq-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:5px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:24px;
+  display:flex;align-items:center;gap:14px;}
+.freq-label::before{content:'';width:32px;height:1px;background:var(--gold);}
+.freq-quote{font-family:'Anton',sans-serif;font-size:clamp(48px,5vw,72px);
+  line-height:.95;letter-spacing:-1px;color:var(--cream);margin-bottom:32px;}
+.freq-quote em{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:400;
+  -webkit-text-stroke:1.5px var(--gold);color:transparent;}
+.freq-quote .red{color:var(--blood);}
+.freq-body{font-family:'Bodoni Moda',serif;font-size:18px;font-weight:300;
+  line-height:1.85;color:rgba(239,233,220,.7);max-width:520px;margin-bottom:32px;}
+.freq-body p{margin-bottom:18px;}
+.freq-body em{font-style:italic;color:var(--gold);}
+.freq-meta{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap;}
+.freq-meta-item{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
+  color:rgba(239,233,220,.45);text-transform:uppercase;
+  border-left:1px solid var(--gold);padding-left:12px;}
+.freq-meta-item b{display:block;color:var(--gold-hot);font-size:14px;
+  font-weight:400;letter-spacing:3px;margin-top:2px;}
+
+/* ======= STYLIST NOTES ======= */
+.section-stylist{padding:140px 56px;background:var(--black);position:relative;
+  border-top:1px solid rgba(200,150,10,.08);}
+.stylist-head{display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:64px;gap:32px;flex-wrap:wrap;}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;}
+.section-label::before{content:'';width:24px;height:1px;background:var(--gold);}
+.section-title{font-family:'Anton',sans-serif;font-size:clamp(64px,8vw,120px);
+  line-height:.88;letter-spacing:-1px;color:var(--cream);}
+.section-title em{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:400;
+  -webkit-text-stroke:1.5px var(--gold);color:transparent;}
+.section-title .num{display:inline-block;font-family:'JetBrains Mono',monospace;
+  font-size:.18em;letter-spacing:3px;color:var(--gold);
+  vertical-align:top;margin-left:12px;}
+
+.stylist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.stylist-card{position:relative;aspect-ratio:3/4;overflow:hidden;cursor:none;}
+.stylist-card img{width:100%;height:100%;object-fit:cover;object-position:center top;
+  filter:grayscale(15%) contrast(1.1);transition:transform 1s,filter .4s;}
+.stylist-card:hover img{transform:scale(1.07);filter:grayscale(0%);}
+.stylist-card::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 30%,rgba(5,5,4,.92));z-index:1;}
+.stylist-corner{position:absolute;top:18px;left:18px;z-index:2;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--gold);background:rgba(5,5,4,.7);padding:4px 8px;
+  border:1px solid rgba(200,150,10,.4);text-transform:uppercase;}
+.stylist-info{position:absolute;bottom:0;left:0;right:0;padding:24px;z-index:2;}
+.stylist-name{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;
+  color:var(--cream);margin-bottom:10px;text-transform:uppercase;line-height:1;}
+.stylist-pieces{font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:2px;color:rgba(239,233,220,.55);text-transform:uppercase;line-height:1.6;}
+.stylist-pieces span{color:var(--gold);}
+
+/* ======= IN THE WILD (UGC grid) ======= */
+.section-wild{padding:140px 0 100px;background:var(--black);
+  border-top:1px solid rgba(200,150,10,.08);}
+.wild-head{padding:0 56px;margin-bottom:48px;display:flex;
+  justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;}
+.wild-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;padding:0 4px;}
+.wild-item{aspect-ratio:1;overflow:hidden;position:relative;cursor:none;}
+.wild-item img{width:100%;height:100%;object-fit:cover;object-position:center top;
+  filter:grayscale(40%) contrast(1.1);transition:transform .8s,filter .4s;}
+.wild-item:hover img{transform:scale(1.1);filter:grayscale(0%);}
+.wild-item::before{content:'';position:absolute;inset:0;background:rgba(5,5,4,.5);
+  transition:opacity .3s;z-index:1;}
+.wild-item:hover::before{opacity:0;}
+.wild-item-handle{position:absolute;bottom:8px;left:8px;z-index:2;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--cream);background:rgba(5,5,4,.7);padding:3px 6px;
+  opacity:0;transform:translateY(8px);transition:all .25s;}
+.wild-item:hover .wild-item-handle{opacity:1;transform:translateY(0);}
+.wild-item.tall{grid-row:span 2;aspect-ratio:auto;}
+
+.wild-cta{padding:64px 56px 0;text-align:center;
+  font-family:'Bodoni Moda',serif;font-style:italic;
+  font-size:18px;color:rgba(239,233,220,.5);}
+.wild-cta b{color:var(--gold);font-weight:400;font-style:normal;
+  font-family:'JetBrains Mono',monospace;letter-spacing:3px;font-size:14px;}
+
+/* ======= REVIEWS / TRANSMISSIONS ======= */
+.section-reviews{padding:140px 56px;background:linear-gradient(180deg,var(--black),var(--off));
+  border-top:1px solid rgba(200,150,10,.08);position:relative;}
+.reviews-head{margin-bottom:56px;display:flex;justify-content:space-between;
+  align-items:flex-end;gap:32px;flex-wrap:wrap;}
+.reviews-stats{display:flex;gap:48px;flex-wrap:wrap;}
+.review-stat{display:flex;flex-direction:column;gap:6px;}
+.review-stat-num{font-family:'Anton',sans-serif;font-size:64px;color:var(--gold);
+  line-height:1;letter-spacing:1px;}
+.review-stat-num .small{font-size:24px;color:rgba(200,150,10,.5);}
+.review-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:3px;color:rgba(239,233,220,.45);text-transform:uppercase;}
+.stars{display:flex;gap:2px;color:var(--gold);font-size:18px;letter-spacing:2px;}
+
+.reviews-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.review-card{
+  border:1px solid rgba(200,150,10,.15);
+  padding:32px;position:relative;background:rgba(255,255,255,.01);
+  transition:border-color .3s,background .3s;
+}
+.review-card:hover{border-color:rgba(200,150,10,.4);background:rgba(200,150,10,.03);}
+.review-head{display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:18px;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:3px;color:rgba(239,233,220,.45);text-transform:uppercase;}
+.review-head .verified{color:var(--gold);display:flex;align-items:center;gap:6px;}
+.review-head .verified::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;}
+.review-stars{margin-bottom:16px;}
+.review-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;
+  color:var(--cream);margin-bottom:10px;line-height:1.1;text-transform:uppercase;}
+.review-body{font-family:'Bodoni Moda',serif;font-size:15px;line-height:1.75;
+  color:rgba(239,233,220,.7);margin-bottom:18px;}
+.review-meta{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:2px;color:rgba(239,233,220,.35);text-transform:uppercase;
+  padding-top:14px;border-top:1px solid rgba(200,150,10,.08);}
+.review-meta b{color:var(--gold);font-weight:400;}
+.review-card::after{content:'// TRANSMISSION';position:absolute;top:-1px;left:24px;
+  background:var(--black);padding:0 10px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--gold);transform:translateY(-50%);}
+
+.reviews-load{margin-top:40px;text-align:center;}
+.btn-load{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;background:transparent;
+  border:1px solid var(--gold-dim);padding:14px 28px;cursor:none;
+  transition:all .25s;}
+.btn-load:hover{border-color:var(--gold);background:rgba(200,150,10,.05);}
+
+/* ======= COMPLETE THE LOOK ======= */
+.section-complete{padding:140px 0 80px;background:var(--black);
+  border-top:1px solid rgba(200,150,10,.08);}
+.complete-head{padding:0 56px;margin-bottom:48px;display:flex;
+  justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;}
+.complete-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 56px;}
+.complete-card{position:relative;aspect-ratio:3/4;overflow:hidden;cursor:none;background:var(--off);
+  transition:transform .4s;}
+.complete-card:hover{transform:translateY(-6px);}
+.complete-card img{width:100%;height:100%;object-fit:cover;object-position:center top;
+  transition:transform 1s,filter .4s;filter:grayscale(15%) contrast(1.1);}
+.complete-card:hover img{transform:scale(1.06);filter:grayscale(0%);}
+.complete-card::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(5,5,4,.95));z-index:1;}
+.complete-info{position:absolute;bottom:0;left:0;right:0;padding:20px;z-index:2;}
+.complete-name{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;
+  color:var(--cream);text-transform:uppercase;margin-bottom:4px;line-height:1.05;}
+.complete-meta{display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
+  color:rgba(239,233,220,.5);}
+.complete-meta b{color:var(--gold-hot);font-weight:400;font-size:12px;}
+.complete-quick{position:absolute;top:14px;right:14px;width:34px;height:34px;
+  background:var(--gold);color:var(--black);font-family:'Anton',sans-serif;
+  font-size:18px;display:flex;align-items:center;justify-content:center;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  opacity:0;transform:scale(.8);transition:all .3s;z-index:3;}
+.complete-card:hover .complete-quick{opacity:1;transform:scale(1);}
+
+/* ======= STICKY CART BAR (appears on scroll past hero) ======= */
+.sticky-bar{position:fixed;bottom:-100px;left:0;right:0;z-index:600;
+  background:rgba(5,5,4,.95);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(200,150,10,.3);padding:14px 32px;
+  display:flex;align-items:center;gap:24px;
+  transition:bottom .4s cubic-bezier(.7,0,.3,1);}
+.sticky-bar.show{bottom:0;}
+.sticky-img{width:54px;height:54px;overflow:hidden;border:1px solid rgba(200,150,10,.3);}
+.sticky-img img{width:100%;height:100%;object-fit:cover;}
+.sticky-info{flex:1;}
+.sticky-name{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:2px;
+  color:var(--cream);text-transform:uppercase;line-height:1.1;}
+.sticky-price{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:var(--gold);margin-top:3px;}
+.sticky-options{display:flex;gap:8px;}
+.sticky-select{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
+  color:rgba(239,233,220,.6);text-transform:uppercase;background:transparent;
+  border:1px solid rgba(200,150,10,.25);padding:8px 14px;cursor:none;}
+.sticky-add{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:3px;
+  background:var(--gold);color:var(--black);border:none;cursor:none;
+  padding:0 28px;height:42px;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
+.sticky-add:hover{background:var(--gold-hot);}
+
+/* ======= CART DRAWER ======= */
+.cart-drawer{position:fixed;top:0;right:-440px;width:420px;max-width:90vw;height:100vh;
+  background:var(--off);z-index:9500;border-left:1px solid rgba(200,150,10,.2);
+  transition:right .5s cubic-bezier(.7,0,.3,1);
+  display:flex;flex-direction:column;}
+.cart-drawer.open{right:0;}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9400;
+  opacity:0;pointer-events:none;transition:opacity .4s;}
+.cart-overlay.show{opacity:1;pointer-events:auto;}
+.cart-head{padding:24px;border-bottom:1px solid rgba(200,150,10,.15);
+  display:flex;justify-content:space-between;align-items:center;}
+.cart-title{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:3px;color:var(--cream);}
+.cart-close{background:transparent;border:none;color:var(--gold);font-size:24px;cursor:none;
+  font-family:'JetBrains Mono',monospace;}
+.cart-body{flex:1;overflow-y:auto;padding:24px;}
+.cart-empty{text-align:center;padding:60px 0;color:rgba(239,233,220,.5);
+  font-family:'Bodoni Moda',serif;font-style:italic;font-size:16px;}
+.cart-empty::before{content:'∅';display:block;font-size:64px;color:var(--gold);
+  margin-bottom:14px;font-style:normal;}
+.cart-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(200,150,10,.08);}
+.cart-item-img{width:72px;height:90px;overflow:hidden;border:1px solid rgba(200,150,10,.2);flex-shrink:0;}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;}
+.cart-item-info{flex:1;}
+.cart-item-name{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:2px;
+  color:var(--cream);text-transform:uppercase;line-height:1.1;margin-bottom:6px;}
+.cart-item-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
+  color:rgba(239,233,220,.5);text-transform:uppercase;margin-bottom:6px;}
+.cart-item-price{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);}
+.cart-item-remove{background:transparent;border:none;color:rgba(239,233,220,.4);
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;cursor:none;padding:6px 0;align-self:flex-start;
+  transition:color .2s;}
+.cart-item-remove:hover{color:var(--blood);}
+.cart-foot{padding:24px;border-top:1px solid rgba(200,150,10,.15);}
+.cart-subtotal{display:flex;justify-content:space-between;margin-bottom:16px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+  color:rgba(239,233,220,.55);text-transform:uppercase;}
+.cart-subtotal b{color:var(--gold);font-family:'Anton',sans-serif;font-size:24px;font-weight:normal;}
+.cart-checkout{width:100%;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:4px;
+  background:var(--gold);color:var(--black);border:none;cursor:none;
+  height:54px;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  position:relative;overflow:hidden;}
+.cart-checkout::before{content:'';position:absolute;inset:0;background:var(--gold-hot);
+  transform:translateY(100%);transition:transform .35s;}
+.cart-checkout span{position:relative;z-index:2;}
+.cart-checkout:hover::before{transform:translateY(0);}
+
+/* ======= TOAST ======= */
+.toast{position:fixed;top:120px;right:24px;z-index:9600;
+  background:var(--gold);color:var(--black);padding:14px 22px;
+  font-family:'Anton',sans-serif;font-size:13px;letter-spacing:3px;
+  text-transform:uppercase;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  transform:translateX(120%);transition:transform .4s cubic-bezier(.7,0,.3,1);
+  display:flex;align-items:center;gap:10px;}
+.toast.show{transform:translateX(0);}
+.toast::before{content:'✓';font-size:18px;}
+
+/* ======= FOOTER (tiny) ======= */
+footer{padding:60px 56px;border-top:1px solid rgba(200,150,10,.15);
+  text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:3px;color:rgba(239,233,220,.3);text-transform:uppercase;}
+footer .big{font-family:'Anton',sans-serif;font-size:clamp(80px,12vw,180px);
+  letter-spacing:-2px;line-height:.85;
+  color:transparent;-webkit-text-stroke:1px rgba(200,150,10,.18);
+  margin-bottom:32px;display:block;}
+footer a{color:var(--gold);text-decoration:none;}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width:1024px){
+  .product-main{grid-template-columns:1fr;padding:0 24px;}
+  .product-gallery{border-right:none;border-bottom:1px solid rgba(200,150,10,.1);}
+  .product-info{padding:48px 0;}
+  .gallery-frame{position:relative;top:0;height:80vh;}
+  .section-specs{grid-template-columns:1fr;gap:32px;}
+  .specs-title{position:static;}
+  .freq-grid{grid-template-columns:1fr;gap:48px;}
+  .freq-image{height:480px;}
+  .stylist-grid{grid-template-columns:1fr 1fr;}
+  .stylist-card:nth-child(3){grid-column:1/3;}
+  .wild-grid{grid-template-columns:repeat(4,1fr);}
+  .complete-grid{grid-template-columns:1fr 1fr;}
+  .reviews-grid{grid-template-columns:1fr;}
+  .breadcrumb,.product-mark,.section-divider,.section-frequency,.section-stylist,
+  .section-reviews{padding-left:24px;padding-right:24px;}
+  .wild-head,.complete-head{padding-left:24px;padding-right:24px;}
+  .complete-grid{padding-left:24px;padding-right:24px;}
+}
+@media (max-width:640px){
+  .cursor-dot,.cursor-ring,.cursor-label{display:none;}body{cursor:auto;}
+  .hud{font-size:9px;}
+  .hud-block:nth-child(2){display:none;}
+  nav{padding:14px 20px;top:36px;}
+  .nav-logo{font-size:22px;letter-spacing:4px;}
+  .breadcrumb{padding-top:120px;}
+  .product-mark{font-size:60px;letter-spacing:-1px;}
+  .product-main{padding:0 16px;}
+  .gallery-frame{height:60vh;}
+  .gallery-thumbs{display:none;}
+  .product-info{padding-left:0;}
+  .info-title{font-size:48px;}
+  .price{font-size:42px;}
+  .size-pad{grid-template-columns:repeat(4,1fr);}
+  .wild-grid{grid-template-columns:repeat(3,1fr);}
+  .complete-grid{grid-template-columns:1fr 1fr;gap:4px;}
+  .stylist-grid{grid-template-columns:1fr;}
+  .stylist-card:nth-child(3){grid-column:auto;}
+  .sticky-bar{padding:10px 16px;gap:12px;}
+  .sticky-options{display:none;}
+  .sticky-img{width:42px;height:42px;}
+  .sticky-add{padding:0 18px;font-size:12px;}
+  .reviews-stats{gap:28px;}
+  .review-stat-num{font-size:42px;}
+  .section-specs,.section-frequency,.section-stylist,.section-reviews{padding:80px 16px;}
+  .section-complete,.section-wild{padding-top:80px;}
+  .freq-image{height:380px;}
+  .freq-quote{font-size:36px;}
+  .specs-grid{grid-template-columns:1fr;}
+  .spec-row.full{grid-column:auto;padding-right:0;}
+  .care-grid{grid-column:auto;grid-template-columns:repeat(3,1fr);}
+  footer{padding:40px 16px;}
+  footer .big{font-size:48px;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR + OVERLAYS -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-label" id="cursorLabel"></div>
+<div class="grain"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-block">
+    <span class="hud-dot live"></span>
+    <span>FILE // 04.001.YL.001</span>
+    <span id="hudTime">00:00:00 UTC</span>
+  </div>
+  <div class="hud-block">
+    <span>CLEARANCE: GRANTED</span>
+    <span id="hudView">VIEWING NOW: <b style="color:var(--gold-hot)">0014</b></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="unknown.html" class="nav-back">← BACK TO COLLECTION</a>
+  <a href="unknown.html" class="nav-logo"><span class="sigil"></span>UNKNOWN</a>
+  <button class="nav-cart" id="cartTrigger">CART <span class="count" id="cartCount">0</span></button>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="unknown.html">HOME</a>
+  <span class="sep">/</span>
+  <a href="unknown.html#runway">SHOP</a>
+  <span class="sep">/</span>
+  <a href="#">HOODIES</a>
+  <span class="sep">/</span>
+  <span class="current">YELLOW PATTERNED</span>
+</div>
+
+<!-- BIG MARK -->
+<div class="product-mark"><span>YELLOW PATTERNED — YELLOW PATTERNED — YELLOW PATTERNED — YELLOW PATTERNED — </span></div>
+
+<!-- PRODUCT MAIN -->
+<section class="product-main">
+  <div class="product-gallery">
+    <div class="gallery-frame">
+      <div class="gallery-bg-text">YELLOW</div>
+      <div class="gallery-corner tl"></div>
+      <div class="gallery-corner tr"></div>
+      <div class="gallery-corner bl"></div>
+      <div class="gallery-corner br"></div>
+
+      <div class="gallery-thumbs" id="galleryThumbs">
+        <div class="gallery-thumb active" data-i="0"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt=""></div>
+        <div class="gallery-thumb" data-i="1"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery2" alt=""></div>
+        <div class="gallery-thumb" data-i="2"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery3" alt=""></div>
+        <div class="gallery-thumb" data-i="3"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery4" alt=""></div>
+      </div>
+
+      <div class="gallery-img-stage" id="galleryStage">
+        <div class="gallery-img active" data-i="0"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt="YELLOW PATTERNED"></div>
+        <div class="gallery-img" data-i="1"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery2" alt=""></div>
+        <div class="gallery-img" data-i="2"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery3" alt=""></div>
+        <div class="gallery-img" data-i="3"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery4" alt=""></div>
+      </div>
+
+      <div class="gallery-meta">VIEW <b id="galleryNum">01</b> / 04</div>
+      <div class="gallery-zoom-hint">HOVER TO ZOOM</div>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="info-header">
+      <div class="info-tag"><span class="star">★</span> ★ PRINT / SS25 / DROP 004</div>
+      <h1 class="info-title">YELLOW<em>PATT</em><br>ERNED</h1>
+      <div class="info-sub">
+        <span>SKU // <b>UNK-04-YL-001</b></span>
+        <span class="div"></span>
+        <span>SS25</span>
+        <span class="div"></span>
+        <span>★ <b>4.9</b> (218)</span>
+      </div>
+    </div>
+
+    <div class="price-block">
+      <span class="price">$128<span class="cents">.00</span></span>
+      <span class="price-old">$158.00</span>
+      <span class="price-installments">or <b>4 × $32</b> payments</span>
+    </div>
+
+    <div class="stock-row">
+      <span class="stock-num"><b id="stockCount">14</b> LEFT IN STOCK</span>
+      <div class="stock-bar"><div class="stock-fill" id="stockBar"></div></div>
+      <span>SELLING FAST</span>
+    </div>
+
+    <p class="info-desc">A bold-print sweatshirt in luminous safety yellow with all-over patterned detail. <em>Made to be seen.</em> Made for the ones who refuse to disappear. Heavyweight cotton fleece, oversized fit, garment-dyed for that perfectly washed-in feel.</p>
+
+    <div class="option-block">
+      <div class="option-label"><span>COLOR // <b id="colorName">BLACK / GOLD</b></span><span>5 OPTIONS</span></div>
+      <div class="swatches" id="swatches">
+        <div class="swatch active" data-color="black-gold" data-name="BLACK / GOLD"></div>
+        <div class="swatch" data-color="all-black" data-name="ALL BLACK"></div>
+        <div class="swatch" data-color="cream" data-name="BONE WHITE"></div>
+        <div class="swatch" data-color="blood" data-name="BLOOD RED"></div>
+        <div class="swatch" data-color="acid" data-name="ACID GREEN"></div>
+      </div>
+    </div>
+
+    <div class="option-block">
+      <div class="option-label"><span>SIZE // <b id="sizeName">SELECT</b></span><a href="#" class="size-guide-link">SIZE GUIDE →</a></div>
+      <div class="size-pad" id="sizePad">
+        <button class="size-btn" data-size="XS"><span>XS</span></button>
+        <button class="size-btn" data-size="S"><span>S</span></button>
+        <button class="size-btn" data-size="M"><span>M</span></button>
+        <button class="size-btn oos" data-size="L"><span>L</span></button>
+        <button class="size-btn" data-size="XL"><span>XL</span></button>
+        <button class="size-btn" data-size="XXL"><span>XXL</span></button>
+      </div>
+    </div>
+
+    <div class="purchase-row">
+      <div class="qty-control">
+        <button class="qty-btn" data-q="-">−</button>
+        <span class="qty-display" id="qtyDisplay">1</span>
+        <button class="qty-btn" data-q="+">+</button>
+      </div>
+      <button class="add-to-bag" id="addToBag"><span>ADD TO BAG <span class="arr">→</span></span></button>
+      <button class="wishlist-btn" id="wishBtn" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        FREE SHIPPING<b>ORDERS $100+</b>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        30 DAY RETURNS<b>NO QUESTIONS</b>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        SECURE CHECKOUT<b>SSL ENCRYPTED</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 02 / TECHNICAL READOUT</div>
+
+<!-- SPECS -->
+<section class="section-specs">
+  <h2 class="specs-title">
+    <span class="num">// FILE 04.001 / SPECS</span>
+    TECH<em>NICAL</em><br>READ<em>OUT</em>
+  </h2>
+  <div class="specs-grid">
+    <div class="spec-row">
+      <span class="spec-label">// MATERIAL</span>
+      <span class="spec-value"><em>14oz</em> French Terry<span class="small">100% RING-SPUN COTTON</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">// FIT</span>
+      <span class="spec-value"><em>Oversized</em> Drape<span class="small">SIZE DOWN FOR REGULAR FIT</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">// PRINT METHOD</span>
+      <span class="spec-value">Hand-pulled <em>Metallic</em> Gold<span class="small">3-LAYER WATER-BASED</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">// CONSTRUCTION</span>
+      <span class="spec-value"><em>Triple</em>-stitched seams<span class="small">GARMENT DYED MIDNIGHT BLACK</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">// ORIGIN</span>
+      <span class="spec-value">Designed in <em>NYC</em><span class="small">PRODUCED IN PORTUGAL</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">// WEIGHT</span>
+      <span class="spec-value"><em>1.4 lbs</em> / 635g<span class="small">SIZE LARGE / MEN'S</span></span>
+    </div>
+    <div class="spec-row full">
+      <span class="spec-label">// MEASUREMENTS / SIZE M</span>
+      <span class="spec-value">CHEST <em>52"</em> / LENGTH <em>28"</em> / SLEEVE <em>26"</em> / SHOULDER <em>22"</em></span>
+    </div>
+    <div class="care-grid">
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 7h18l-2 13H5z"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M9 13c1 1 2 1 3 0s2-1 3 0"/></svg>
+        WASH COLD<br>30°C MAX
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        NO BLEACH
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="11" width="18" height="9"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        TUMBLE LOW
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 21h14L12 4z"/><circle cx="12" cy="13" r="2"/></svg>
+        IRON LOW<br>INSIDE OUT
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2a8 8 0 0 1 8 8c0 4-8 12-8 12S4 14 4 10a8 8 0 0 1 8-8z"/></svg>
+        DO NOT<br>DRY CLEAN
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 03 / FREQUENCY</div>
+
+<!-- FREQUENCY (story) -->
+<section class="section-frequency">
+  <div class="freq-bg">YELLOW</div>
+  <div class="freq-grid">
+    <div class="freq-image" data-tag="// FILE 04.001"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt=""></div>
+    <div class="freq-content">
+      <div class="freq-label">// THE STORY / 04.001</div>
+      <h2 class="freq-quote">YELLOW IS NOT A <em>WARNING.</em><br>IT&#39;S AN <span class="red">INVITATION.</span></h2>
+      <div class="freq-body">
+        <p>The skull came from a sketch on the back of a receipt — drawn at <em>3am</em> in a diner in Bushwick after a night nobody can remember properly. We kept the wobble in the lines. We kept the imperfection. The gold ink runs thicker on the left because that's how it came out the first time, and that's how it stays.</p>
+        <p>This hoodie was made <em>198 times</em> before we got it right. Every iteration thrown out. Every fit re-cut. Every weight re-tested.</p>
+        <p>What you're wearing is the <em>199th attempt</em>. Production capped at 2,000 units worldwide. After that, it's gone forever.</p>
+      </div>
+      <div class="freq-meta">
+        <div class="freq-meta-item">EDITION<b>199 / FINAL</b></div>
+        <div class="freq-meta-item">UNITS<b>2,000 GLOBAL</b></div>
+        <div class="freq-meta-item">RESTOCK<b>NEVER</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 04 / STYLIST'S NOTES</div>
+
+<!-- STYLIST -->
+<section class="section-stylist">
+  <div class="stylist-head">
+    <div>
+      <p class="section-label">// HOW IT'S WORN</p>
+      <h2 class="section-title">STY<em>LE</em>D<span class="num">/ 04</span></h2>
+    </div>
+  </div>
+  <div class="stylist-grid">
+    <div class="stylist-card">
+      <span class="stylist-corner">LOOK 01 — STREET</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="story" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">DAYTIME / STREET</div>
+        <div class="stylist-pieces"><span>+</span> CARGO TROUSERS<br><span>+</span> SHIELD VISOR<br><span>+</span> BLACK SNEAKERS</div>
+      </div>
+    </div>
+    <div class="stylist-card">
+      <span class="stylist-corner">LOOK 02 — LAYERED</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="stylist1" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">EVENING / LAYERED</div>
+        <div class="stylist-pieces"><span>+</span> BOMBER JACKET<br><span>+</span> WIDE LEG DENIM<br><span>+</span> COMBAT BOOTS</div>
+      </div>
+    </div>
+    <div class="stylist-card">
+      <span class="stylist-corner">LOOK 03 — MONO</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="stylist2" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">MONOCHROME / RAW</div>
+        <div class="stylist-pieces"><span>+</span> BLACK MONOGRAM SET<br><span>+</span> GOLD CHAIN<br><span>+</span> WHITE LEATHERS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 05 / IN THE WILD</div>
+
+<!-- IN THE WILD -->
+<section class="section-wild">
+  <div class="wild-head">
+    <div>
+      <p class="section-label">// SPOTTED IN ROTATION</p>
+      <h2 class="section-title">IN <em>THE</em> WILD<span class="num">/ 05</span></h2>
+    </div>
+  </div>
+  <div class="wild-grid">
+    <div class="wild-item tall"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="stylist3" alt=""><span class="wild-item-handle">@FREQUENCY.NYC</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild1" alt=""><span class="wild-item-handle">@___UNKNOWN</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild2" alt=""><span class="wild-item-handle">@CLEARANCE</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild3" alt=""><span class="wild-item-handle">@DRIP.04</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild4" alt=""><span class="wild-item-handle">@HOODED.04</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild5" alt=""><span class="wild-item-handle">@FRQ.NYC</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild6" alt=""><span class="wild-item-handle">@RED.UNKNOWN</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild7" alt=""><span class="wild-item-handle">@VARSITY.04</span></div>
+  </div>
+  <p class="wild-cta">TAG <b>@UNKNOWN</b> WITH <b>#DRIP004</b> TO BE FEATURED</p>
+</section>
+
+<div class="section-divider"><svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3"/></svg>SECTION 06 / TRANSMISSIONS</div>
+
+<!-- REVIEWS -->
+<section class="section-reviews">
+  <div class="reviews-head">
+    <div>
+      <p class="section-label">// INTERCEPTED / VERIFIED</p>
+      <h2 class="section-title">TRANS<em>MISS</em>IONS<span class="num">/ 06</span></h2>
+    </div>
+    <div class="reviews-stats">
+      <div class="review-stat">
+        <span class="review-stat-num">4.9<span class="small">/5</span></span>
+        <span class="stars">★ ★ ★ ★ ★</span>
+        <span class="review-stat-label">218 REVIEWS</span>
+      </div>
+      <div class="review-stat">
+        <span class="review-stat-num">94<span class="small">%</span></span>
+        <span class="review-stat-label">RECOMMEND</span>
+      </div>
+      <div class="review-stat">
+        <span class="review-stat-num">86<span class="small">%</span></span>
+        <span class="review-stat-label">FIT TRUE TO SIZE</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-head">
+        <span>// 04.218 / B.NYC</span>
+        <span class="verified">VERIFIED</span>
+      </div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">FRESH OUT THE DRYER.</h3>
+      <p class="review-body">Bought this on launch day and haven't taken it off since. The weight is unreal — feels like wearing armor. The gold print holds up after 12+ washes, no fading. <em>Worth every dollar.</em></p>
+      <div class="review-meta">
+        <span>SIZE PURCHASED // <b>L</b></span>
+        <span>USUAL SIZE // <b>L</b></span>
+      </div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head">
+        <span>// 04.217 / M.LDN</span>
+        <span class="verified">VERIFIED</span>
+      </div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">RUNS OVERSIZED // ON PURPOSE.</h3>
+      <p class="review-body">Sized down from XL to L per the size guide and it's perfect. The drape is everything. Got more compliments wearing this than my last three coats combined.</p>
+      <div class="review-meta">
+        <span>SIZE PURCHASED // <b>L</b></span>
+        <span>USUAL SIZE // <b>XL</b></span>
+      </div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head">
+        <span>// 04.216 / J.BERLIN</span>
+        <span class="verified">VERIFIED</span>
+      </div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">THE PACKAGING ALONE.</h3>
+      <p class="review-body">Came wrapped in this insane gold-foil pouch with a numbered authenticity card. <em>Detail beyond what you'd expect.</em> Hoodie itself fits perfect, the gold is metallic for real, not flat ink.</p>
+      <div class="review-meta">
+        <span>SIZE PURCHASED // <b>M</b></span>
+        <span>USUAL SIZE // <b>M</b></span>
+      </div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head">
+        <span>// 04.215 / S.LA</span>
+        <span class="verified">VERIFIED</span>
+      </div>
+      <div class="review-stars stars">★ ★ ★ ★ ☆</div>
+      <h3 class="review-title">HEAVYWEIGHT — IN A GOOD WAY.</h3>
+      <p class="review-body">Took off a star because it's almost too warm for LA, but I knew that going in. Quality is unmatched. The fit is so cleanly oversized — like the cut was actually thought about.</p>
+      <div class="review-meta">
+        <span>SIZE PURCHASED // <b>M</b></span>
+        <span>USUAL SIZE // <b>M</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-load">
+    <button class="btn-load">LOAD MORE TRANSMISSIONS →</button>
+  </div>
+</section>
+
+<!-- COMPLETE THE LOOK -->
+<section class="section-complete">
+  <div class="complete-head">
+    <div>
+      <p class="section-label">// PAIRS WELL WITH</p>
+      <h2 class="section-title">COMP<em>LETE</em> IT<span class="num">/ 07</span></h2>
+    </div>
+    <a href="unknown.html#runway" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-dim);padding-bottom:6px;">VIEW ALL →</a>
+  </div>
+  <div class="complete-grid">
+    <a href="#" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild8" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">SHIELD VISOR<br>BLACK / GOLD</div>
+        <div class="complete-meta"><span>EYEWEAR</span><span><b>$68</b></span></div>
+      </div>
+    </a>
+    <a href="#" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp1" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">BOMBER<br>BLACK</div>
+        <div class="complete-meta"><span>OUTERWEAR</span><span><b>$178</b></span></div>
+      </div>
+    </a>
+    <a href="#" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp2" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">MONOGRAM<br>SPORT SET</div>
+        <div class="complete-meta"><span>BODYWEAR</span><span><b>$118</b></span></div>
+      </div>
+    </a>
+    <a href="#" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp3" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">VARSITY<br>CLASSIC</div>
+        <div class="complete-meta"><span>OUTERWEAR</span><span><b>$198</b></span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-img"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp4" alt=""></div>
+  <div class="sticky-info">
+    <div class="sticky-name">YELLOW PATTERNED SWEATSHIRT</div>
+    <div class="sticky-price">$128.00 / SIZE <b id="stickySize">—</b></div>
+  </div>
+  <div class="sticky-options">
+    <span class="sticky-select">M</span>
+    <span class="sticky-select">BLK/GLD</span>
+  </div>
+  <button class="sticky-add" id="stickyAdd">ADD TO BAG →</button>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3 class="cart-title">YOUR BAG</h3>
+    <button class="cart-close" id="cartClose">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">YOUR BAG IS EMPTY.<br>BEGIN THE TRANSMISSION.</div>
+  </div>
+  <div class="cart-foot">
+    <div class="cart-subtotal"><span>SUBTOTAL</span><b id="cartSubtotal">$0.00</b></div>
+    <button class="cart-checkout"><span>CHECKOUT →</span></button>
+  </div>
+</aside>
+
+<!-- TOAST -->
+<div class="toast" id="toast">ADDED TO BAG</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="big">UNKNOWN</span>
+  <div>© 2025 UNKNOWN BRAND // <a href="unknown.html">RETURN HOME</a> // FREQUENCY 004.0</div>
+</footer>
+
+<script>
+/* ============ IMAGE CONFIG ============
+ * Per-product page: YELLOW PATTERNED
+ *
+ * Pools available:
+ *   lifestyle/  (1..78)   general lifestyle photos
+ *   apparel/    (1..60)   general product shots
+ *   blackyellow/          black_&_yellow_webp/
+ *   yellow/               yellow_patterned_webp/
+ *   green/                sweatshirt_green_design_webp/
+ *   multicolor/           sweatshirt_mutli_color_webp/
+ *
+ * Slot formats:
+ *   { pool: 'lifestyle', n: 12 }              numbered pool
+ *   { pool: 'green',     f: 'filename.webp' }  exact filename
+ */
+const POOL_BASE = {
+  lifestyle:    'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/lifestyle_webp/lifestyle_',
+  apparel:      'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/apparel_webp/',
+  green:        'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/sweatshirt_green_design_webp/',
+  yellow:       'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/yellow_patterned_webp/',
+  blackyellow:  'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/black_7_yellow_webp/',
+  multicolor:   'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/sweatshirt_mutli_color_webp/',
+};
+
+const IMG = {
+  // ─── PRODUCT GALLERY (4 angles) ───
+  gallery1:    { pool: 'yellow', f: 'yellow_product_01.webp' },
+  gallery2:    { pool: 'yellow', f: 'yellow_product_02.webp' },
+  gallery3:    { pool: 'yellow', f: 'yellow_model_01.webp' },
+  gallery4:    { pool: 'yellow', f: 'yellow_product_detail.webp' },
+
+  // ─── STORY IMAGE ───
+  story:       { pool: 'yellow', f: 'yellow_model_magazine.webp' },
+
+  // ─── STYLIST CARDS (3 styling shots) ───
+  stylist1:    { pool: 'yellow', f: 'yellow_model_03.webp' },
+  stylist2:    { pool: 'yellow', f: 'yellow_model_double.webp' },
+  stylist3:    { pool: 'yellow', f: 'yellow_model_comp.webp' },
+
+  // ─── IN THE WILD (8-photo grid) ───
+  wild1:       { pool: 'yellow', f: 'yellow_model_04.webp' },
+  wild2:       { pool: 'yellow', f: 'yellow_model_05.webp' },
+  wild3:       { pool: 'yellow', f: 'yellow_model_06.webp' },
+  wild4:       { pool: 'yellow', f: 'yellow_model_2.webp' },
+  wild5:       { pool: 'yellow', f: 'yellow_model_double_02.webp' },
+  wild6:       { pool: 'yellow', f: 'yellow_model_double_03.webp' },
+  wild7:       { pool: 'yellow', f: 'yellow_model_magazine_02.webp' },
+  wild8:       { pool: 'yellow', f: 'yellow_model_comp_02.webp' },
+
+  // ─── COMPLETE THE LOOK (4 companion products) ───
+  comp1:       { pool: 'blackyellow', f: 'black_&_yellow_hero.webp' },
+  comp2:       { pool: 'green',      f: 'green_sweatshirt_solo.webp' },
+  comp3:       { pool: 'multicolor', f: 'multi_solo_02_result.webp' },
+  comp4:       { pool: 'apparel',    n: 14 },
+};
+
+function imgURL(slot) {
+  const cfg = IMG[slot];
+  if (!cfg) return '';
+  const base = POOL_BASE[cfg.pool];
+  if (!base) return '';
+  // Encode special characters in filenames (& becomes %26, etc.)
+  if (cfg.f) return base + encodeURIComponent(cfg.f).replace(/%2F/g, '/');
+  return base + cfg.n + '.webp';
+}
+
+document.querySelectorAll('img[data-img]').forEach(el => {
+  const slot = el.dataset.img;
+  const url = imgURL(slot);
+  if (url) el.src = url;
+});
+
+
+/* ========= CURSOR ========= */
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing'),label=document.getElementById('cursorLabel');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;
+  dot.style.left=mx+'px';dot.style.top=my+'px';label.style.left=mx+'px';label.style.top=my+'px';});
+function loop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);}loop();
+document.querySelectorAll('a, button, .swatch, .gallery-thumb, .stylist-card, .wild-item, .complete-card, .review-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{document.body.classList.add('hovering');
+    const lab=el.dataset.cursor||(el.tagName==='A'||el.tagName==='BUTTON'?'CLICK':'VIEW');
+    label.textContent=lab;label.classList.add('show');});
+  el.addEventListener('mouseleave',()=>{document.body.classList.remove('hovering');label.classList.remove('show');});
+});
+
+/* ========= HUD CLOCK ========= */
+function tick(){const d=new Date();
+  document.getElementById('hudTime').textContent=`${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}:${String(d.getUTCSeconds()).padStart(2,'0')} UTC`;}
+setInterval(tick,1000);tick();
+
+let viewers=14;
+setInterval(()=>{viewers+=Math.random()>.5?1:-1;viewers=Math.max(8,Math.min(38,viewers));
+  const v=document.getElementById('hudView');if(v)v.innerHTML=`VIEWING NOW: <b style="color:var(--gold-hot)">${String(viewers).padStart(4,'0')}</b>`;},2400);
+
+/* ========= NAV SCROLL ========= */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>60);});
+
+/* ========= GALLERY (click thumb to swap) ========= */
+const stage=document.getElementById('galleryStage');
+const thumbs=document.getElementById('galleryThumbs');
+const galleryNum=document.getElementById('galleryNum');
+thumbs.addEventListener('click',e=>{
+  const t=e.target.closest('.gallery-thumb');if(!t)return;
+  const i=t.dataset.i;
+  document.querySelectorAll('.gallery-thumb').forEach(el=>el.classList.toggle('active',el===t));
+  document.querySelectorAll('.gallery-img').forEach(el=>el.classList.toggle('active',el.dataset.i===i));
+  galleryNum.textContent=String(parseInt(i)+1).padStart(2,'0');
+});
+/* gallery zoom on hover */
+stage.addEventListener('mousemove',e=>{
+  const r=stage.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width-0.5;
+  const y=(e.clientY-r.top)/r.height-0.5;
+  const active=stage.querySelector('.gallery-img.active img');
+  if(active)active.style.transform=`scale(1.15) translate(${-x*30}px, ${-y*30}px)`;
+});
+stage.addEventListener('mouseleave',()=>{
+  const active=stage.querySelector('.gallery-img.active img');
+  if(active)active.style.transform='';
+});
+
+/* ========= STOCK COUNTER (decrements) ========= */
+let stock=14;
+const stockCount=document.getElementById('stockCount');
+const stockBar=document.getElementById('stockBar');
+function updateStock(){
+  stockCount.textContent=stock;
+  stockBar.style.width=Math.max(8,(stock/30)*100)+'%';
+}
+setInterval(()=>{
+  if(Math.random()>.7 && stock>3){stock--;updateStock();}
+},14000);
+updateStock();
+
+/* ========= COLOR SWATCHES ========= */
+const colorName=document.getElementById('colorName');
+document.querySelectorAll('.swatch').forEach(s=>{
+  s.addEventListener('click',()=>{
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));
+    s.classList.add('active');
+    colorName.textContent=s.dataset.name;
+  });
+});
+
+/* ========= SIZE SELECTION ========= */
+const sizeName=document.getElementById('sizeName');
+const stickySize=document.getElementById('stickySize');
+let selectedSize=null;
+document.querySelectorAll('.size-btn:not(.oos)').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    selectedSize=b.dataset.size;
+    sizeName.textContent=selectedSize;
+    stickySize.textContent=selectedSize;
+  });
+});
+
+/* ========= QTY ========= */
+const qtyD=document.getElementById('qtyDisplay');
+let qty=1;
+document.querySelectorAll('.qty-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(b.dataset.q==='+'&&qty<10)qty++;
+    if(b.dataset.q==='-'&&qty>1)qty--;
+    qtyD.textContent=qty;
+  });
+});
+
+/* ========= ADD TO BAG ========= */
+const cart=[];
+const addBtn=document.getElementById('addToBag');
+const stickyAdd=document.getElementById('stickyAdd');
+const cartCount=document.getElementById('cartCount');
+const toast=document.getElementById('toast');
+
+function addToCart(){
+  if(!selectedSize){
+    sizeName.textContent='SELECT A SIZE';
+    sizeName.style.color='var(--blood)';
+    setTimeout(()=>{sizeName.style.color='';sizeName.textContent='SELECT';},1800);
+    return;
+  }
+  cart.push({
+    name:'YELLOW PATTERNED SWEATSHIRT',
+    size:selectedSize,
+    color:colorName.textContent,
+    qty:qty,
+    price:128,
+    img: imgURL('gallery1')
+  });
+  cartCount.textContent=cart.reduce((a,c)=>a+c.qty,0);
+  renderCart();
+  addBtn.classList.add('adding');
+  addBtn.querySelector('span').innerHTML='✓ ADDED';
+  setTimeout(()=>{addBtn.classList.remove('adding');addBtn.querySelector('span').innerHTML='ADD TO BAG <span class="arr">→</span>';},1400);
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2400);
+}
+addBtn.addEventListener('click',addToCart);
+stickyAdd.addEventListener('click',addToCart);
+
+/* ========= CART DRAWER ========= */
+const cartTrig=document.getElementById('cartTrigger');
+const cartDrawer=document.getElementById('cartDrawer');
+const cartOverlay=document.getElementById('cartOverlay');
+const cartClose=document.getElementById('cartClose');
+const cartBody=document.getElementById('cartBody');
+const cartSubtotal=document.getElementById('cartSubtotal');
+function openCart(){cartDrawer.classList.add('open');cartOverlay.classList.add('show');}
+function closeCart(){cartDrawer.classList.remove('open');cartOverlay.classList.remove('show');}
+cartTrig.addEventListener('click',openCart);
+cartClose.addEventListener('click',closeCart);
+cartOverlay.addEventListener('click',closeCart);
+
+function renderCart(){
+  if(cart.length===0){
+    cartBody.innerHTML='<div class="cart-empty">YOUR BAG IS EMPTY.<br>BEGIN THE TRANSMISSION.</div>';
+    cartSubtotal.textContent='$0.00';return;
+  }
+  cartBody.innerHTML=cart.map((item,i)=>`
+    <div class="cart-item">
+      <div class="cart-item-img"><img src="${item.img}" alt=""></div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-meta">SIZE ${item.size} / ${item.color} / QTY ${item.qty}</div>
+        <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
+        <button class="cart-item-remove" data-i="${i}">REMOVE</button>
+      </div>
+    </div>`).join('');
+  cartBody.querySelectorAll('.cart-item-remove').forEach(b=>{
+    b.addEventListener('click',()=>{cart.splice(parseInt(b.dataset.i),1);
+      cartCount.textContent=cart.reduce((a,c)=>a+c.qty,0);renderCart();});
+  });
+  const sub=cart.reduce((a,c)=>a+c.price*c.qty,0);
+  cartSubtotal.textContent='$'+sub.toFixed(2);
+}
+
+/* ========= WISHLIST ========= */
+const wish=document.getElementById('wishBtn');
+wish.addEventListener('click',()=>{wish.classList.toggle('active');});
+
+/* ========= STICKY BAR ========= */
+const sticky=document.getElementById('stickyBar');
+window.addEventListener('scroll',()=>{
+  sticky.classList.toggle('show',window.scrollY>window.innerHeight*0.7);
+});
+
+/* ========= SCRAMBLE ON SCROLL ========= */
+const chars='!<>-_\\/[]{}—=+*^?#________ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+class Scramble{
+  constructor(el){this.el=el;this.original=el.innerHTML;this.done=false;}
+  run(){if(this.done)return;this.done=true;
+    const text=this.el.textContent;let frame=0;const total=18;
+    const start=text.split('').map(()=>Math.floor(Math.random()*8));
+    const ends=text.split('').map((_,i)=>start[i]+Math.floor(Math.random()*8)+6);
+    const int=setInterval(()=>{let out='';
+      for(let i=0;i<text.length;i++){
+        if(frame<start[i])out+=text[i];
+        else if(frame>ends[i])out+=text[i];
+        else if(text[i]===' '||text[i]==='\n')out+=text[i];
+        else out+=chars[Math.floor(Math.random()*chars.length)];}
+      this.el.textContent=out;frame++;
+      if(frame>total){clearInterval(int);this.el.innerHTML=this.original;}},40);}}
+const sObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const s=e.target._s;if(s)s.run();}});},{threshold:0.3});
+document.querySelectorAll('.review-title, .stylist-name, .complete-name, .review-stat-num').forEach(el=>{
+  if(el.children.length===0||el.querySelector('em, br, .small')){el._s=new Scramble(el);sObs.observe(el);}
+});
+
+/* ========= REVEAL ON SCROLL ========= */
+const rObs=new IntersectionObserver(es=>{es.forEach((e)=>{if(e.isIntersecting){
+  e.target.style.opacity=1;e.target.style.transform='translateY(0)';}});},{threshold:0.1});
+document.querySelectorAll('.spec-row, .stylist-card, .wild-item, .review-card, .complete-card').forEach((el,i)=>{
+  el.style.opacity=0;el.style.transform='translateY(40px)';
+  el.style.transition=`opacity .8s cubic-bezier(.16,1,.3,1) ${i*0.04}s, transform .8s cubic-bezier(.16,1,.3,1) ${i*0.04}s`;
+  rObs.observe(el);
+});
+</script>
+</body>
+</html>
