@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RED & BLACK DYE — UNKNOWN / SS25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold:#C8960A;
+  --gold-hot:#FFC83A;
+  --gold-dim:#6E4F00;
+  --black:#050504;
+  --off:#0B0A08;
+  --paper:#EFE9DC;
+  --cream:#F4EFE3;
+  --blood:#C8281C;
+  --blood-hot:#FF3F30;
+  --acid:#D8FF3A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;background:var(--black);}
+body{background:var(--black);color:var(--cream);font-family:'Bodoni Moda',serif;overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased;}
+
+/* ======= CURSOR / GRAIN / SCANLINES ======= */
+.cursor-dot{width:6px;height:6px;background:var(--blood);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .25s,height .25s;}
+.cursor-ring{width:36px;height:36px;border:1px solid var(--blood);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,border-color .25s;}
+.cursor-label{position:fixed;pointer-events:none;z-index:9999;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--blood);text-transform:uppercase;padding:6px 10px;background:rgba(5,5,4,.85);border:1px solid rgba(200,40,28,.4);transform:translate(20px,20px);opacity:0;transition:opacity .2s;white-space:nowrap;}
+.cursor-label.show{opacity:1;}
+body.hovering .cursor-ring{width:64px;height:64px;border-color:var(--blood-hot);}
+body.hovering .cursor-dot{width:0;height:0;}
+body.dragging .cursor-ring{width:96px;height:96px;border:2px solid var(--blood-hot);background:rgba(200,40,28,.06);}
+
+.grain{position:fixed;inset:-50%;width:200%;height:200%;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.78  0 0 0 0 0.59  0 0 0 0 0.04  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");pointer-events:none;z-index:9000;opacity:.16;animation:grain .6s steps(4) infinite;mix-blend-mode:overlay;}
+@keyframes grain{0%{transform:translate(0,0);}25%{transform:translate(-2%,3%);}50%{transform:translate(3%,-2%);}75%{transform:translate(-1%,1%);}100%{transform:translate(0,0);}}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:8999;background:repeating-linear-gradient(180deg,transparent 0,transparent 2px,rgba(0,0,0,.18) 3px,transparent 4px);opacity:.22;mix-blend-mode:multiply;}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:8998;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.65) 100%);}
+
+/* blood-tinted vignette overlay for this product */
+.blood-vignette{position:fixed;inset:0;pointer-events:none;z-index:8997;background:radial-gradient(ellipse at 80% 20%, rgba(200,40,28,.08) 0%, transparent 60%);animation:vignettePulse 8s ease-in-out infinite;}
+@keyframes vignettePulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+/* ======= HUD ======= */
+.hud{position:fixed;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:4px;color:rgba(239,233,220,.4);z-index:550;pointer-events:none;text-transform:uppercase;}
+.hud-block{display:flex;gap:16px;align-items:center;}
+.hud-mark{color:var(--blood);font-size:11px;display:inline-block;animation:slowSpin 24s linear infinite;margin-right:6px;}
+@keyframes slowSpin{to{transform:rotate(360deg);}}
+.hud-dot{width:5px;height:5px;background:var(--blood);border-radius:50%;animation:blink 1.4s infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ======= NAV ======= */
+nav{position:fixed;top:48px;left:0;right:0;z-index:500;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,border-color .4s,padding .3s;border-bottom:1px solid transparent;}
+nav.scrolled{background:rgba(5,5,4,.82);backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(200,40,28,.25);padding:14px 32px;}
+.nav-logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:6px;color:var(--cream);text-decoration:none;display:flex;align-items:center;gap:10px;}
+.nav-logo .sigil{width:18px;height:18px;background:var(--blood);clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%);animation:spin 8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(239,233,220,.7);text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:8px;transition:color .2s,gap .2s;}
+.nav-back:hover{color:var(--blood);gap:12px;}
+.nav-cart{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--blood);text-decoration:none;border:1px solid rgba(200,40,28,.4);padding:8px 14px;text-transform:uppercase;cursor:none;background:rgba(5,5,4,.5);display:flex;gap:8px;align-items:center;}
+.nav-cart:hover{background:var(--blood);color:var(--cream);}
+.nav-cart .count{background:var(--blood);color:var(--cream);padding:2px 6px;font-size:10px;}
+
+/* ======= BREADCRUMB ======= */
+.breadcrumb{padding:140px 56px 0;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(239,233,220,.4);text-transform:uppercase;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.breadcrumb a{color:rgba(239,233,220,.5);text-decoration:none;transition:color .2s;}
+.breadcrumb a:hover{color:var(--blood);}
+.breadcrumb .sep{color:var(--blood);}
+.breadcrumb .current{color:var(--blood);}
+
+/* ======= PRODUCT MARK ======= */
+.product-mark{padding:24px 56px 8px;font-family:'Anton',sans-serif;font-size:clamp(80px,11vw,160px);letter-spacing:-2px;line-height:.85;color:transparent;-webkit-text-stroke:1px rgba(200,40,28,.18);white-space:nowrap;overflow:hidden;opacity:.55;}
+.product-mark span{display:inline-block;animation:slideMark 22s linear infinite;}
+@keyframes slideMark{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ======= MAIN PRODUCT GRID ======= */
+.product-main{display:grid;grid-template-columns:1.15fr 1fr;gap:0;padding:0 56px;position:relative;border-top:1px solid rgba(200,40,28,.15);}
+.product-gallery{position:relative;border-right:1px solid rgba(200,40,28,.1);}
+.gallery-frame{position:sticky;top:140px;height:calc(100vh - 160px);display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--off);}
+.gallery-bg-text{position:absolute;font-family:'Anton',sans-serif;font-size:clamp(140px,18vw,280px);letter-spacing:-8px;line-height:.85;color:transparent;-webkit-text-stroke:1px rgba(200,40,28,.06);z-index:1;white-space:nowrap;animation:bgDrift 30s ease-in-out infinite alternate;}
+@keyframes bgDrift{from{transform:translateX(-10%);}to{transform:translateX(10%);}}
+.gallery-img-stage{position:relative;width:80%;height:80%;display:flex;align-items:center;justify-content:center;z-index:2;perspective:1500px;}
+.gallery-img{position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .6s;}
+.gallery-img.active{opacity:1;}
+.gallery-img img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 40px 80px rgba(0,0,0,.6));transition:transform .15s ease-out;cursor:none;}
+.gallery-corner{position:absolute;width:18px;height:18px;border:1px solid var(--blood);z-index:5;}
+.gallery-corner.tl{top:24px;left:24px;border-right:none;border-bottom:none;}
+.gallery-corner.tr{top:24px;right:24px;border-left:none;border-bottom:none;}
+.gallery-corner.bl{bottom:24px;left:24px;border-right:none;border-top:none;}
+.gallery-corner.br{bottom:24px;right:24px;border-left:none;border-top:none;}
+.gallery-meta{position:absolute;bottom:24px;left:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(239,233,220,.4);z-index:5;text-transform:uppercase;}
+.gallery-meta b{color:var(--blood);font-weight:400;}
+.gallery-zoom-hint{position:absolute;bottom:24px;right:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(239,233,220,.4);z-index:5;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.gallery-thumbs{position:absolute;left:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:5;}
+.gallery-thumb{width:48px;height:60px;border:1px solid rgba(200,40,28,.3);cursor:none;overflow:hidden;background:var(--black);transition:border-color .25s,transform .25s;position:relative;}
+.gallery-thumb img{width:100%;height:100%;object-fit:cover;opacity:.6;transition:opacity .25s;}
+.gallery-thumb:hover{border-color:var(--blood);transform:translateX(4px);}
+.gallery-thumb:hover img,.gallery-thumb.active img{opacity:1;}
+.gallery-thumb.active{border-color:var(--blood);}
+.gallery-thumb.active::after{content:'';position:absolute;left:-4px;top:0;bottom:0;width:2px;background:var(--blood);}
+
+/* product info */
+.product-info{padding:80px 0 80px 56px;position:relative;}
+.info-header{margin-bottom:32px;}
+.info-tag{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--blood);text-transform:uppercase;border:1px solid var(--blood);padding:5px 10px;margin-bottom:24px;}
+.info-title{font-family:'Anton',sans-serif;font-size:clamp(48px,5.5vw,84px);line-height:.92;letter-spacing:-1px;color:var(--cream);margin-bottom:20px;text-transform:uppercase;}
+.info-sub{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(239,233,220,.45);text-transform:uppercase;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.info-sub .div{width:14px;height:1px;background:rgba(200,40,28,.4);}
+.info-sub b{color:var(--blood-hot);font-weight:400;}
+
+.price-block{display:flex;align-items:baseline;gap:18px;margin:32px 0 12px;padding:24px 0;border-top:1px solid rgba(200,40,28,.15);border-bottom:1px solid rgba(200,40,28,.15);}
+.price{font-family:'Anton',sans-serif;font-size:54px;letter-spacing:1px;color:var(--blood);}
+.price .cents{font-size:24px;color:rgba(200,40,28,.6);vertical-align:top;margin-left:2px;}
+.price-old{font-family:'JetBrains Mono',monospace;font-size:14px;color:rgba(239,233,220,.35);text-decoration:line-through;}
+.price-installments{margin-left:auto;font-family:'Bodoni Moda',serif;font-style:italic;font-size:13px;color:rgba(239,233,220,.55);}
+.price-installments b{color:var(--blood);font-weight:400;}
+
+.stock-row{display:flex;justify-content:space-between;align-items:center;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(239,233,220,.5);text-transform:uppercase;}
+.stock-bar{flex:1;margin:0 16px;height:2px;background:rgba(200,40,28,.15);position:relative;overflow:hidden;}
+.stock-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(to right,var(--blood),#FF0000);width:12%;}
+.stock-fill::after{content:'';position:absolute;right:-4px;top:-3px;bottom:-3px;width:2px;background:var(--blood-hot);box-shadow:0 0 8px var(--blood-hot);}
+.stock-num b{color:var(--blood-hot);font-weight:400;font-size:13px;}
+
+.info-desc{font-family:'Bodoni Moda',serif;font-size:16px;line-height:1.85;color:rgba(239,233,220,.7);margin:24px 0 36px;max-width:540px;}
+.info-desc em{font-style:italic;color:var(--blood);}
+
+/* swatches */
+.option-block{margin-bottom:28px;}
+.option-label{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;color:rgba(239,233,220,.55);text-transform:uppercase;margin-bottom:14px;}
+.option-label b{color:var(--blood);font-weight:400;}
+.swatches{display:flex;gap:10px;flex-wrap:wrap;}
+.swatch{width:46px;height:46px;border:1px solid rgba(200,40,28,.25);cursor:none;position:relative;background:var(--black);transition:border-color .25s;}
+.swatch::before{content:'';position:absolute;inset:5px;}
+.swatch[data-color="red-black"]::before{background:linear-gradient(135deg,#1a0404 40%,var(--blood) 40%,var(--blood) 60%,#1a0404 60%);}
+.swatch[data-color="all-black"]::before{background:#0a0a08;}
+.swatch[data-color="black-rust"]::before{background:linear-gradient(135deg,#0a0a08 50%,#8B3A1A 50%);}
+.swatch[data-color="blood-cream"]::before{background:linear-gradient(135deg,var(--blood) 50%,var(--cream) 50%);}
+.swatch:hover{border-color:var(--blood);}
+.swatch.active{border-color:var(--blood-hot);}
+.swatch.active::after{content:'';position:absolute;inset:-4px;border:1px solid var(--blood-hot);}
+
+/* size pad */
+.size-pad{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
+.size-btn{aspect-ratio:1.4/1;border:1px solid rgba(200,40,28,.25);background:transparent;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;text-transform:uppercase;cursor:none;transition:border-color .2s,background .2s,color .2s;position:relative;}
+.size-btn span{position:relative;z-index:2;}
+.size-btn::before{content:'';position:absolute;inset:0;background:var(--blood);transform:scaleY(0);transform-origin:bottom;transition:transform .25s cubic-bezier(.7,0,.3,1);}
+.size-btn:hover{border-color:var(--blood);}
+.size-btn:hover::before{transform:scaleY(1);}
+.size-btn.active{background:var(--blood);color:var(--cream);border-color:var(--blood);}
+.size-btn.oos{opacity:.3;pointer-events:none;}
+.size-btn.oos::after{content:'';position:absolute;inset:0;background:linear-gradient(to top right, transparent calc(50% - .5px), rgba(200,40,28,.4) calc(50% - .5px), rgba(200,40,28,.4) calc(50% + .5px), transparent calc(50% + .5px));}
+.size-guide-link{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(239,233,220,.4);text-decoration:none;text-transform:uppercase;border-bottom:1px solid rgba(239,233,220,.15);padding-bottom:2px;transition:color .2s;}
+.size-guide-link:hover{color:var(--blood);}
+
+/* purchase row */
+.purchase-row{display:flex;gap:8px;align-items:stretch;margin-top:20px;}
+.qty-control{display:flex;align-items:stretch;border:1px solid rgba(200,40,28,.3);}
+.qty-btn{width:44px;height:56px;background:transparent;border:none;color:var(--cream);font-size:22px;cursor:none;transition:background .2s;}
+.qty-btn:hover{background:rgba(200,40,28,.15);}
+.qty-display{width:48px;height:56px;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:24px;color:var(--cream);border-left:1px solid rgba(200,40,28,.2);border-right:1px solid rgba(200,40,28,.2);}
+.add-to-bag{flex:1;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:4px;background:var(--blood);color:var(--cream);border:none;cursor:none;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);position:relative;overflow:hidden;transition:background .25s;}
+.add-to-bag::before{content:'';position:absolute;inset:0;background:var(--blood-hot);transform:translateY(100%);transition:transform .35s cubic-bezier(.7,0,.3,1);}
+.add-to-bag span{position:relative;z-index:2;display:flex;gap:8px;align-items:center;justify-content:center;}
+.add-to-bag:hover::before{transform:translateY(0);}
+.add-to-bag .arr{transition:transform .3s;}
+.add-to-bag:hover .arr{transform:translateX(4px);}
+.add-to-bag.adding{background:#333;}
+.wishlist-btn{width:56px;height:56px;border:1px solid rgba(200,40,28,.3);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;}
+.wishlist-btn svg{width:20px;height:20px;color:rgba(239,233,220,.5);transition:color .2s,fill .2s;}
+.wishlist-btn:hover{border-color:var(--blood);}
+.wishlist-btn:hover svg{color:var(--blood);}
+.wishlist-btn.active svg{fill:var(--blood);color:var(--blood);}
+
+/* trust row */
+.trust-row{display:flex;gap:0;margin:32px 0 0;padding-top:20px;border-top:1px solid rgba(200,40,28,.1);}
+.trust-item{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(239,233,220,.4);padding-right:12px;border-right:1px solid rgba(200,40,28,.08);}
+.trust-item:last-child{border-right:none;}
+.trust-item svg{width:14px;height:14px;color:var(--blood);margin-bottom:4px;}
+.trust-item b{display:block;color:rgba(239,233,220,.65);font-weight:400;letter-spacing:2px;margin-top:2px;}
+
+/* ======= SPECS ======= */
+.section-specs{padding:120px 56px;display:grid;grid-template-columns:1fr 2.5fr;gap:80px;border-top:1px solid rgba(200,40,28,.1);}
+.specs-title{font-family:'Anton',sans-serif;font-size:clamp(48px,6vw,88px);line-height:.88;letter-spacing:-1px;color:var(--cream);position:sticky;top:140px;}
+.specs-title .num{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--blood);margin-bottom:16px;font-weight:400;}
+.specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.spec-row{padding:20px 0;border-bottom:1px solid rgba(200,40,28,.08);}
+.spec-row.full{grid-column:1/3;padding-right:0;}
+.spec-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(239,233,220,.35);margin-bottom:6px;display:block;}
+.spec-value{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--cream);line-height:1.4;}
+.spec-value em{font-style:normal;color:var(--blood);}
+.spec-value .small{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(239,233,220,.4);margin-top:4px;}
+.care-grid{grid-column:1/3;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:16px 0;}
+.care-icon{border:1px solid rgba(200,40,28,.15);padding:14px 8px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:rgba(239,233,220,.4);text-transform:uppercase;line-height:1.6;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.care-icon svg{width:28px;height:28px;color:var(--blood);opacity:.6;}
+
+/* ======= FREQUENCY (story) ======= */
+.section-frequency{padding:120px 56px;border-top:1px solid rgba(200,40,28,.1);position:relative;overflow:hidden;}
+.freq-bg{position:absolute;font-family:'Anton',sans-serif;font-size:clamp(200px,26vw,480px);color:transparent;-webkit-text-stroke:1px rgba(200,40,28,.05);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-20px;}
+.freq-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:2;}
+.freq-image{height:560px;overflow:hidden;position:relative;}
+.freq-image img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:contrast(1.15) saturate(.85);}
+.freq-image::after{content:attr(data-tag);position:absolute;bottom:16px;left:16px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--blood);background:rgba(5,5,4,.85);padding:4px 8px;border:1px solid rgba(200,40,28,.3);}
+.freq-content{position:relative;}
+.freq-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--blood);margin-bottom:18px;display:flex;align-items:center;gap:12px;}
+.freq-label::before{content:'';width:24px;height:1px;background:var(--blood);}
+.freq-quote{font-family:'Anton',sans-serif;font-size:clamp(44px,5vw,72px);line-height:.92;letter-spacing:-1px;color:var(--cream);margin-bottom:32px;}
+.freq-quote em{color:var(--blood);}
+.red{color:var(--blood);}
+.freq-body{font-family:'Bodoni Moda',serif;font-size:17px;line-height:1.85;color:rgba(239,233,220,.65);margin-bottom:32px;}
+.freq-body p{margin-bottom:18px;}
+.freq-body em{font-style:italic;color:var(--blood);}
+.freq-meta{display:flex;gap:32px;flex-wrap:wrap;}
+.freq-meta-item{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(239,233,220,.4);border-left:1px solid var(--blood);padding-left:12px;}
+.freq-meta-item b{display:block;color:var(--blood);font-weight:400;font-size:13px;margin-top:2px;letter-spacing:2px;}
+
+/* ======= STYLIST ======= */
+.section-stylist{padding:120px 56px;border-top:1px solid rgba(200,40,28,.1);}
+.stylist-head{margin-bottom:56px;display:flex;justify-content:space-between;align-items:flex-end;}
+.stylist-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;}
+.stylist-card{position:relative;overflow:hidden;aspect-ratio:2/3;}
+.stylist-card img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(15%) contrast(1.1);transition:transform .8s cubic-bezier(.16,1,.3,1),filter .4s;}
+.stylist-card:hover img{transform:scale(1.05);filter:grayscale(0%);}
+.stylist-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,5,4,.95));z-index:1;}
+.stylist-corner{position:absolute;top:14px;left:14px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--blood);background:rgba(5,5,4,.7);padding:4px 8px;border:1px solid rgba(200,40,28,.3);text-transform:uppercase;}
+.stylist-info{position:absolute;bottom:0;left:0;right:0;padding:20px;z-index:2;}
+.stylist-name{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;color:var(--cream);text-transform:uppercase;margin-bottom:8px;}
+.stylist-pieces{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(239,233,220,.5);text-transform:uppercase;line-height:1.8;}
+.stylist-pieces span{color:var(--blood);margin-right:6px;}
+
+/* ======= IN THE WILD ======= */
+.section-wild{padding-top:120px;}
+.wild-head{padding:0 56px;margin-bottom:56px;display:flex;justify-content:space-between;align-items:flex-end;}
+.wild-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;padding:0 4px;}
+.wild-item{position:relative;overflow:hidden;aspect-ratio:2/3;}
+.wild-item.tall{grid-row:span 2;aspect-ratio:auto;}
+.wild-item img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(15%);transition:transform .8s,filter .4s;}
+.wild-item:hover img{transform:scale(1.05);filter:grayscale(0%);}
+.wild-item::before{content:'';position:absolute;inset:0;background:rgba(5,5,4,.35);z-index:1;transition:opacity .3s;}
+.wild-item:hover::before{opacity:0;}
+.wild-item-handle{position:absolute;bottom:8px;left:8px;right:8px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--blood);text-transform:uppercase;transform:translateY(100%);transition:transform .3s;}
+.wild-item:hover .wild-item-handle{transform:translateY(0);}
+.wild-cta{text-align:center;padding:40px 56px 0;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:rgba(239,233,220,.4);text-transform:uppercase;}
+.wild-cta b{color:var(--blood);}
+
+/* ======= REVIEWS ======= */
+.section-reviews{padding:120px 56px;border-top:1px solid rgba(200,40,28,.1);}
+.reviews-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:56px;gap:32px;flex-wrap:wrap;}
+.reviews-stats{display:flex;gap:48px;align-items:center;}
+.review-stat{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.review-stat-num{font-family:'Anton',sans-serif;font-size:56px;letter-spacing:-1px;color:var(--blood);line-height:1;}
+.review-stat-num .small{font-size:24px;color:rgba(200,40,28,.6);}
+.stars{color:var(--blood);font-size:16px;letter-spacing:3px;}
+.review-stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(239,233,220,.4);}
+.reviews-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.review-card{background:var(--off);padding:28px;border:1px solid rgba(200,40,28,.08);position:relative;overflow:hidden;}
+.review-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--blood),transparent);}
+.review-head{display:flex;justify-content:space-between;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(239,233,220,.4);text-transform:uppercase;}
+.verified{color:var(--blood);}
+.review-stars{margin-bottom:10px;}
+.review-title{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:2px;color:var(--cream);text-transform:uppercase;margin-bottom:10px;}
+.review-body{font-family:'Bodoni Moda',serif;font-size:15px;line-height:1.75;color:rgba(239,233,220,.65);margin-bottom:14px;}
+.review-body em{font-style:italic;color:var(--blood);}
+.review-meta{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(239,233,220,.35);display:flex;gap:20px;flex-wrap:wrap;}
+.review-meta b{color:rgba(239,233,220,.55);font-weight:400;}
+.reviews-load{text-align:center;margin-top:40px;}
+.btn-load{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--blood);background:transparent;border:1px solid rgba(200,40,28,.3);padding:14px 32px;cursor:none;transition:background .2s,color .2s;}
+.btn-load:hover{background:var(--blood);color:var(--cream);}
+
+/* ======= COMPLETE THE LOOK ======= */
+.section-complete{padding:120px 0;border-top:1px solid rgba(200,40,28,.1);}
+.complete-head{padding:0 56px;margin-bottom:56px;display:flex;justify-content:space-between;align-items:flex-end;}
+.complete-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 4px;}
+.complete-card{display:block;text-decoration:none;color:inherit;position:relative;overflow:hidden;background:var(--off);}
+.complete-card img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:center top;filter:grayscale(15%);transition:transform .8s,filter .4s;}
+.complete-card:hover img{transform:scale(1.05);filter:grayscale(0%);}
+.complete-quick{position:absolute;top:14px;right:14px;width:38px;height:38px;background:var(--blood);color:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:22px;opacity:0;transform:scale(.7);transition:all .3s;}
+.complete-card:hover .complete-quick{opacity:1;transform:scale(1);}
+.complete-info{padding:18px 16px;}
+.complete-name{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:var(--cream);line-height:1.05;margin-bottom:8px;}
+.complete-meta{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(239,233,220,.4);text-transform:uppercase;}
+.complete-meta b{color:var(--blood);font-weight:400;}
+
+/* ======= STICKY BAR ======= */
+.sticky-bar{position:fixed;bottom:-80px;left:0;right:0;z-index:400;background:rgba(5,5,4,.95);backdrop-filter:blur(12px);border-top:1px solid rgba(200,40,28,.2);padding:12px 32px;display:flex;align-items:center;gap:16px;transition:bottom .4s cubic-bezier(.7,0,.3,1);}
+.sticky-bar.show{bottom:0;}
+.sticky-img{width:48px;height:48px;border:1px solid rgba(200,40,28,.25);overflow:hidden;flex-shrink:0;}
+.sticky-img img{width:100%;height:100%;object-fit:cover;}
+.sticky-info{flex:1;min-width:0;}
+.sticky-name{font-family:'Anton',sans-serif;font-size:13px;letter-spacing:2px;color:var(--cream);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sticky-price{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(239,233,220,.45);text-transform:uppercase;margin-top:2px;}
+.sticky-price b{color:var(--blood);}
+.sticky-options{display:flex;gap:8px;flex-shrink:0;}
+.sticky-select{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(239,233,220,.55);border:1px solid rgba(200,40,28,.2);padding:6px 12px;}
+.sticky-add{font-family:'Anton',sans-serif;font-size:13px;letter-spacing:4px;background:var(--blood);color:var(--cream);border:none;cursor:none;padding:0 28px;height:42px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
+.sticky-add:hover{background:var(--blood-hot);}
+
+/* ======= CART DRAWER ======= */
+.cart-drawer{position:fixed;top:0;right:-440px;width:420px;max-width:90vw;height:100vh;background:var(--off);z-index:9500;border-left:1px solid rgba(200,40,28,.2);transition:right .5s cubic-bezier(.7,0,.3,1);display:flex;flex-direction:column;}
+.cart-drawer.open{right:0;}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9400;opacity:0;pointer-events:none;transition:opacity .4s;}
+.cart-overlay.show{opacity:1;pointer-events:auto;}
+.cart-head{padding:24px;border-bottom:1px solid rgba(200,40,28,.15);display:flex;justify-content:space-between;align-items:center;}
+.cart-title{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:3px;color:var(--cream);}
+.cart-close{background:transparent;border:none;color:var(--blood);font-size:24px;cursor:none;font-family:'JetBrains Mono',monospace;}
+.cart-body{flex:1;overflow-y:auto;padding:24px;}
+.cart-empty{text-align:center;padding:60px 0;color:rgba(239,233,220,.5);font-family:'Bodoni Moda',serif;font-style:italic;font-size:16px;}
+.cart-empty::before{content:'∅';display:block;font-size:64px;color:var(--blood);margin-bottom:14px;font-style:normal;}
+.cart-item{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(200,40,28,.08);}
+.cart-item-img{width:72px;height:90px;overflow:hidden;border:1px solid rgba(200,40,28,.2);flex-shrink:0;}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;}
+.cart-item-info{flex:1;}
+.cart-item-name{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:2px;color:var(--cream);text-transform:uppercase;line-height:1.1;margin-bottom:6px;}
+.cart-item-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(239,233,220,.5);text-transform:uppercase;margin-bottom:6px;}
+.cart-item-price{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--blood);}
+.cart-item-remove{background:transparent;border:none;color:rgba(239,233,220,.4);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:none;padding:6px 0;align-self:flex-start;transition:color .2s;}
+.cart-item-remove:hover{color:var(--blood);}
+.cart-foot{padding:24px;border-top:1px solid rgba(200,40,28,.15);}
+.cart-subtotal{display:flex;justify-content:space-between;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;color:rgba(239,233,220,.55);text-transform:uppercase;}
+.cart-subtotal b{color:var(--blood);font-family:'Anton',sans-serif;font-size:24px;font-weight:normal;}
+.cart-checkout{width:100%;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:4px;background:var(--blood);color:var(--cream);border:none;cursor:none;height:54px;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);position:relative;overflow:hidden;}
+.cart-checkout::before{content:'';position:absolute;inset:0;background:var(--blood-hot);transform:translateY(100%);transition:transform .35s;}
+.cart-checkout span{position:relative;z-index:2;}
+.cart-checkout:hover::before{transform:translateY(0);}
+
+/* ======= TOAST ======= */
+.toast{position:fixed;top:120px;right:24px;z-index:9600;background:var(--blood);color:var(--cream);padding:14px 22px;font-family:'Anton',sans-serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transform:translateX(120%);transition:transform .4s cubic-bezier(.7,0,.3,1);display:flex;align-items:center;gap:10px;}
+.toast.show{transform:translateX(0);}
+.toast::before{content:'✓';font-size:18px;}
+
+/* ======= DIVIDERS ======= */
+.divider-mark{text-align:center;padding:32px 16px;color:var(--blood);font-size:14px;letter-spacing:8px;background:var(--black);position:relative;}
+.divider-mark::before,.divider-mark::after{content:'';position:absolute;top:50%;height:1px;width:64px;}
+.divider-mark::before{left:50%;transform:translateX(-72px);background:linear-gradient(to left,rgba(200,40,28,.3),transparent);}
+.divider-mark::after{left:50%;transform:translateX(8px);background:linear-gradient(to right,rgba(200,40,28,.3),transparent);}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--blood);margin-bottom:12px;display:block;}
+.section-title{font-family:'Anton',sans-serif;font-size:clamp(64px,8vw,120px);line-height:.88;letter-spacing:-1px;color:var(--cream);}
+
+/* ======= FOOTER ======= */
+footer{padding:60px 56px;border-top:1px solid rgba(200,40,28,.15);text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(239,233,220,.3);text-transform:uppercase;}
+footer .big{font-family:'Anton',sans-serif;font-size:clamp(80px,12vw,180px);letter-spacing:-2px;line-height:.85;color:transparent;-webkit-text-stroke:1px rgba(200,40,28,.18);margin-bottom:32px;display:block;}
+footer a{color:var(--blood);text-decoration:none;}
+
+/* ======= PP CAROUSEL ======= */
+.pp-carousel-strip{position:relative;background:var(--black);padding:0 0 14px;border-bottom:1px solid rgba(200,40,28,.08);}
+.pp-carousel-strip-label{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(239,233,220,.4);text-transform:uppercase;}
+.pp-carousel-strip-label b{color:var(--blood);font-weight:400;}
+.pp-carousel-strip-label .pulse-dot{display:inline-block;width:5px;height:5px;background:var(--blood);border-radius:50%;margin-right:6px;animation:blink 1.4s infinite;}
+.pp-carousel-track{display:flex;overflow:hidden;mask-image:linear-gradient(90deg,transparent,black 4%,black 96%,transparent);}
+.pp-carousel-track-inner{display:flex;gap:5px;padding:0 24px;animation:carouselLoop 36s linear infinite;will-change:transform;}
+@keyframes carouselLoop{from{transform:translateX(0);}to{transform:translateX(calc(-50% - 2.5px));}}
+.pp-carousel-item{flex-shrink:0;width:220px;height:280px;overflow:hidden;position:relative;background:var(--off);}
+.pp-carousel-item img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(10%) contrast(1.08);transition:transform .8s,filter .4s;}
+.pp-carousel-item:hover img{transform:scale(1.04);filter:grayscale(0%);}
+
+/* ======= RESPONSIVE ======= */
+html,body{overflow-x:hidden!important;max-width:100vw!important;}
+.product-mark{overflow:hidden!important;}
+@media (max-width:1024px){
+  .product-main{grid-template-columns:1fr;padding:0 24px;}
+  .product-gallery{border-right:none;border-bottom:1px solid rgba(200,40,28,.1);}
+  .product-info{padding:48px 0;}
+  .gallery-frame{position:relative;top:0;height:80vh;}
+  .section-specs{grid-template-columns:1fr;gap:32px;}
+  .specs-title{position:static;}
+  .freq-grid{grid-template-columns:1fr;gap:48px;}
+  .freq-image{height:480px;}
+  .stylist-grid{grid-template-columns:1fr 1fr;}
+  .stylist-card:nth-child(3){grid-column:1/3;}
+  .wild-grid{grid-template-columns:repeat(4,1fr);}
+  .complete-grid{grid-template-columns:1fr 1fr;}
+  .reviews-grid{grid-template-columns:1fr;}
+  .breadcrumb,.product-mark,.section-specs,.section-frequency,.section-stylist,.section-reviews{padding-left:24px;padding-right:24px;}
+  .wild-head,.complete-head{padding-left:24px;padding-right:24px;}
+  .complete-grid{padding-left:24px;padding-right:24px;}
+}
+@media (max-width:640px){
+  .cursor-dot,.cursor-ring,.cursor-label{display:none;}body{cursor:auto;}
+  nav{padding:14px 20px;top:36px;}
+  .nav-logo{font-size:22px;letter-spacing:4px;}
+  .breadcrumb{padding-top:120px;padding-left:16px;padding-right:16px;}
+  .product-mark{font-size:48px!important;padding:14px 16px 4px!important;}
+  .product-main{padding:0 16px;}
+  .gallery-frame{height:60vh;}
+  .gallery-thumbs{display:none;}
+  .product-info{padding-left:0;}
+  .info-title{font-size:48px;}
+  .price{font-size:42px;}
+  .size-pad{grid-template-columns:repeat(4,1fr);}
+  .wild-grid{grid-template-columns:repeat(3,1fr);}
+  .complete-grid{grid-template-columns:1fr 1fr;gap:4px;}
+  .stylist-grid{grid-template-columns:1fr;}
+  .stylist-card:nth-child(3){grid-column:auto;}
+  .sticky-bar{padding:10px 16px;gap:12px;}
+  .sticky-options{display:none;}
+  .sticky-img{width:42px;height:42px;}
+  .sticky-add{padding:0 18px;font-size:12px;}
+  .section-specs,.section-frequency,.section-stylist,.section-reviews{padding:80px 16px;}
+  .section-complete,.section-wild{padding-top:80px;}
+  .freq-image{height:300px;}
+  .freq-quote{font-size:clamp(28px,8vw,44px)!important;line-height:1!important;}
+  .specs-grid{grid-template-columns:1fr;}
+  .spec-row.full{grid-column:auto;}
+  .care-grid{grid-column:auto;grid-template-columns:repeat(3,1fr);}
+  .reviews-stats{gap:28px;}
+  .gallery-bg-text,.freq-bg{display:none!important;}
+  footer{padding:40px 16px;}
+  footer .big{font-size:48px;}
+  .pp-carousel-item{width:140px!important;height:180px!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR + OVERLAYS -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-label" id="cursorLabel"></div>
+<div class="grain"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="blood-vignette"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-block">
+    <span class="hud-mark">✦</span>
+    <span>FILE // 04.005.RD.001</span>
+    <span id="hudTime">00:00:00 UTC</span>
+  </div>
+  <div class="hud-block">
+    <span class="hud-dot"></span>
+    <span>CLEARANCE: GRANTED</span>
+    <span id="hudView">VIEWING NOW: <b style="color:var(--blood-hot)">0009</b></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="nav-back">← BACK</a>
+  <a href="index.html" class="nav-logo"><span class="sigil"></span>UNKNOWN</a>
+  <button class="nav-cart" id="cartTrigger">CART <span class="count" id="cartCount">0</span></button>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">HOME</a>
+  <span class="sep">/</span>
+  <a href="index.html#runway">SHOP</a>
+  <span class="sep">/</span>
+  <a href="#">HOODIES</a>
+  <span class="sep">/</span>
+  <span class="current">RED &amp; BLACK DYE</span>
+</div>
+
+<!-- PRODUCT MARK -->
+<div class="product-mark"><span>RED &amp; BLACK DYE — RED &amp; BLACK DYE — RED &amp; BLACK DYE — RED &amp; BLACK DYE — RED &amp; BLACK DYE — RED &amp; BLACK DYE — </span></div>
+
+<!-- CAROUSEL (above gallery) -->
+<div class="pp-carousel-strip">
+  <div class="pp-carousel-strip-label">
+    <span><span class="pulse-dot"></span>// IN ROTATION / <b>DYE / WASH</b></span>
+    <span>未知 — SS25</span>
+  </div>
+  <div class="pp-carousel-track">
+    <div class="pp-carousel-track-inner" id="ppTrack">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MAIN -->
+<section class="product-main">
+  <div class="product-gallery">
+    <div class="gallery-frame">
+      <div class="gallery-bg-text">RED</div>
+      <div class="gallery-corner tl"></div>
+      <div class="gallery-corner tr"></div>
+      <div class="gallery-corner bl"></div>
+      <div class="gallery-corner br"></div>
+
+      <div class="gallery-thumbs" id="galleryThumbs">
+        <div class="gallery-thumb active" data-i="0"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt=""></div>
+        <div class="gallery-thumb" data-i="1"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery2" alt=""></div>
+        <div class="gallery-thumb" data-i="2"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery3" alt=""></div>
+        <div class="gallery-thumb" data-i="3"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery4" alt=""></div>
+        <div class="gallery-thumb" data-i="4"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery5" alt=""></div>
+        <div class="gallery-thumb" data-i="5"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery6" alt=""></div>
+      </div>
+
+      <div class="gallery-img-stage" id="galleryStage">
+        <div class="gallery-img active" data-i="0"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt="RED &amp; BLACK DYE"></div>
+        <div class="gallery-img" data-i="1"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery2" alt=""></div>
+        <div class="gallery-img" data-i="2"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery3" alt=""></div>
+        <div class="gallery-img" data-i="3"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery4" alt=""></div>
+        <div class="gallery-img" data-i="4"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery5" alt=""></div>
+        <div class="gallery-img" data-i="5"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery6" alt=""></div>
+      </div>
+
+      <div class="gallery-meta">VIEW <b id="galleryNum">01</b> / 06</div>
+      <div class="gallery-zoom-hint">HOVER TO ZOOM</div>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="info-header">
+      <div class="info-tag">血 DYE / WASH — SS25 / DROP 004</div>
+      <h1 class="info-title">RED &amp;<br>BLACK DYE</h1>
+      <div class="info-sub">
+        <span>SKU // <b>UNK-04-RD-001</b></span>
+        <span class="div"></span>
+        <span>SS25</span>
+        <span class="div"></span>
+        <span>★ <b>5.0</b> (41)</span>
+      </div>
+    </div>
+
+    <div class="price-block">
+      <span class="price">$158<span class="cents">.00</span></span>
+      <span class="price-installments">or <b>4 × $39</b> payments</span>
+    </div>
+
+    <div class="stock-row">
+      <span class="stock-num"><b id="stockCount">9</b> LEFT IN STOCK</span>
+      <div class="stock-bar"><div class="stock-fill" id="stockBar"></div></div>
+      <span>SELLING FAST</span>
+    </div>
+
+    <p class="info-desc">Hand-dyed in small batches. No two pieces are identical — the bleed is <em>intentional</em>, the wash is <em>irreversible</em>. The red runs through black like something you can't take back. Limited to what we could dye. When it's gone, it's gone.</p>
+
+    <div class="option-block">
+      <div class="option-label"><span>COLOR // <b id="colorName">RED / BLACK DYE</b></span><span>4 OPTIONS</span></div>
+      <div class="swatches" id="swatches">
+        <div class="swatch active" data-color="red-black" data-name="RED / BLACK DYE"></div>
+        <div class="swatch" data-color="all-black" data-name="ALL BLACK"></div>
+        <div class="swatch" data-color="black-rust" data-name="BLACK / RUST"></div>
+        <div class="swatch" data-color="blood-cream" data-name="BLOOD / BONE"></div>
+      </div>
+    </div>
+
+    <div class="option-block">
+      <div class="option-label"><span>SIZE // <b id="sizeName">SELECT</b></span><a href="#" class="size-guide-link">SIZE GUIDE →</a></div>
+      <div class="size-pad" id="sizePad">
+        <button class="size-btn" data-size="XS"><span>XS</span></button>
+        <button class="size-btn" data-size="S"><span>S</span></button>
+        <button class="size-btn" data-size="M"><span>M</span></button>
+        <button class="size-btn oos" data-size="L"><span>L</span></button>
+        <button class="size-btn" data-size="XL"><span>XL</span></button>
+        <button class="size-btn oos" data-size="XXL"><span>XXL</span></button>
+      </div>
+    </div>
+
+    <div class="purchase-row">
+      <div class="qty-control">
+        <button class="qty-btn" data-q="-">−</button>
+        <span class="qty-display" id="qtyDisplay">1</span>
+        <button class="qty-btn" data-q="+">+</button>
+      </div>
+      <button class="add-to-bag" id="addToBag"><span>ADD TO BAG <span class="arr">→</span></span></button>
+      <button class="wishlist-btn" id="wishBtn" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        FREE SHIPPING<b>ORDERS $100+</b>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        30 DAY RETURNS<b>NO QUESTIONS</b>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        SECURE CHECKOUT<b>SSL ENCRYPTED</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-mark">血 ✦ 未知</div>
+
+<!-- SPECS -->
+<section class="section-specs">
+  <h2 class="specs-title">
+    <span class="num">// FILE 04.005 / SPECS</span>
+    TECH<br>READ<br>OUT
+  </h2>
+  <div class="specs-grid">
+    <div class="spec-row">
+      <span class="spec-label">MATERIAL</span>
+      <span class="spec-value"><em>14oz</em> French Terry<span class="small">100% RING-SPUN COTTON</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">FIT</span>
+      <span class="spec-value"><em>Oversized</em> Drape<span class="small">SIZE DOWN FOR REGULAR FIT</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">DYE METHOD</span>
+      <span class="spec-value"><em>Hand</em> Batch Dyed<span class="small">NO TWO PIECES IDENTICAL</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">CONSTRUCTION</span>
+      <span class="spec-value"><em>Triple</em>-stitched seams<span class="small">GARMENT DYED BASE FABRIC</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">ORIGIN</span>
+      <span class="spec-value">Designed in <em>NYC</em><span class="small">PRODUCED IN PORTUGAL</span></span>
+    </div>
+    <div class="spec-row">
+      <span class="spec-label">EDITION</span>
+      <span class="spec-value"><em>Small Batch</em> Only<span class="small">PRODUCTION CLOSED</span></span>
+    </div>
+    <div class="spec-row full">
+      <span class="spec-label">MEASUREMENTS / SIZE M</span>
+      <span class="spec-value">CHEST <em>52"</em> / LENGTH <em>28"</em> / SLEEVE <em>26"</em> / SHOULDER <em>22"</em></span>
+    </div>
+    <div class="care-grid">
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 7h18l-2 13H5z"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        WASH COLD<br>SEPARATELY
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        NO BLEACH
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="11" width="18" height="9"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        TUMBLE LOW
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 21h14L12 4z"/><circle cx="12" cy="13" r="2"/></svg>
+        IRON LOW<br>INSIDE OUT
+      </div>
+      <div class="care-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2a8 8 0 0 1 8 8c0 4-8 12-8 12S4 14 4 10a8 8 0 0 1 8-8z"/></svg>
+        DO NOT<br>DRY CLEAN
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-mark">✦</div>
+
+<!-- STORY -->
+<section class="section-frequency">
+  <div class="freq-bg">RED</div>
+  <div class="freq-grid">
+    <div class="freq-image" data-tag="// BATCH 001 / DYE">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="story" alt="">
+    </div>
+    <div class="freq-content">
+      <div class="freq-label">// THE PROCESS</div>
+      <h2 class="freq-quote">SOMETHING HAPPENED.<br>WE KEPT THE <em>EVIDENCE.</em></h2>
+      <div class="freq-body">
+        <p>The dye wasn&rsquo;t planned. A test run. A batch that bled further than expected — <em>deep red pulling through the black</em> in ways we couldn&rsquo;t predict and couldn&rsquo;t repeat.</p>
+        <p>We looked at it and decided: this is the piece. We dyed what we could. We kept the inconsistency. No two are the same. The process is closed.</p>
+        <p>You are wearing <em>a record of something that happened once.</em></p>
+      </div>
+      <div class="freq-meta">
+        <div class="freq-meta-item">BATCH<b>001 / FINAL</b></div>
+        <div class="freq-meta-item">METHOD<b>HAND DYE</b></div>
+        <div class="freq-meta-item">RESTOCK<b>NEVER</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-mark">✦</div>
+
+<!-- STYLING -->
+<section class="section-stylist">
+  <div class="stylist-head">
+    <div>
+      <span class="section-label">✦ HOW IT IS WORN</span>
+      <h2 class="section-title">STYLED</h2>
+    </div>
+  </div>
+  <div class="stylist-grid">
+    <div class="stylist-card">
+      <span class="stylist-corner">01 — DARK</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="style1" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">ALL BLACK / DARK</div>
+        <div class="stylist-pieces"><span>+</span> BLACK CARGO TROUSERS<br><span>+</span> SHIELD VISOR<br><span>+</span> BLACK BOOTS</div>
+      </div>
+    </div>
+    <div class="stylist-card">
+      <span class="stylist-corner">02 — CONTRAST</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="style2" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">RED / CONTRAST</div>
+        <div class="stylist-pieces"><span>+</span> CREAM WIDE TROUSERS<br><span>+</span> GOLD CHAIN<br><span>+</span> WHITE LEATHER SNEAKERS</div>
+      </div>
+    </div>
+    <div class="stylist-card">
+      <span class="stylist-corner">03 — LAYERED</span>
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="style3" alt="">
+      <div class="stylist-info">
+        <div class="stylist-name">LAYERED / HEAVY</div>
+        <div class="stylist-pieces"><span>+</span> BOMBER OVER<br><span>+</span> WIDE DENIM<br><span>+</span> COMBAT BOOTS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider-mark">✦</div>
+
+<!-- IN THE WILD -->
+<section class="section-wild">
+  <div class="wild-head">
+    <div>
+      <span class="section-label">✦ IN ROTATION</span>
+      <h2 class="section-title">IN THE WILD</h2>
+    </div>
+  </div>
+  <div class="wild-grid">
+    <div class="wild-item tall"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild1" alt=""><span class="wild-item-handle">@UNKNOWN</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild2" alt=""><span class="wild-item-handle">@DYE.004</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild3" alt=""><span class="wild-item-handle">@FREQUENCY</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild4" alt=""><span class="wild-item-handle">@RED.UNK</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild5" alt=""><span class="wild-item-handle">@BATCH001</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild6" alt=""><span class="wild-item-handle">@DRIP.SS25</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild7" alt=""><span class="wild-item-handle">@CLEARANCE</span></div>
+    <div class="wild-item"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="wild8" alt=""><span class="wild-item-handle">@UNKWN.NYC</span></div>
+  </div>
+  <p class="wild-cta">TAG <b>@UNKNOWN</b> WITH <b>#DYE004</b> TO BE FEATURED</p>
+</section>
+
+<div class="divider-mark">✦</div>
+
+<!-- REVIEWS -->
+<section class="section-reviews">
+  <div class="reviews-head">
+    <div>
+      <span class="section-label">✦ TRANSMISSIONS</span>
+      <h2 class="section-title">REVIEWS</h2>
+    </div>
+    <div class="reviews-stats">
+      <div class="review-stat">
+        <span class="review-stat-num">5.0<span class="small">/5</span></span>
+        <span class="stars">★ ★ ★ ★ ★</span>
+        <span class="review-stat-label">41 REVIEWS</span>
+      </div>
+      <div class="review-stat">
+        <span class="review-stat-num">100<span class="small">%</span></span>
+        <span class="review-stat-label">RECOMMEND</span>
+      </div>
+      <div class="review-stat">
+        <span class="review-stat-num">89<span class="small">%</span></span>
+        <span class="review-stat-label">FIT TRUE</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-head"><span>04.041 — K.NYC</span><span class="verified">VERIFIED</span></div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">NOTHING ELSE LIKE IT.</h3>
+      <p class="review-body">The dye pattern on mine goes heavy red across the left shoulder and fades down through the chest. Completely different from the photos. <em>That's the point.</em> You genuinely can't get the same one twice.</p>
+      <div class="review-meta"><span>SIZE // <b>M</b></span><span>USUAL // <b>M</b></span></div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head"><span>04.040 — T.LDN</span><span class="verified">VERIFIED</span></div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">THE WEIGHT. THE RED.</h3>
+      <p class="review-body">Came beautifully packaged. The weight hits different — it's substantial. The red is deep crimson, not orange, not pink. <em>Exactly right.</em> Sold out everywhere else, got lucky I caught this.</p>
+      <div class="review-meta"><span>SIZE // <b>L</b></span><span>USUAL // <b>L</b></span></div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head"><span>04.039 — J.PARIS</span><span class="verified">VERIFIED</span></div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">WORE IT ONCE. NEVER TOOK IT OFF.</h3>
+      <p class="review-body">The dye is permanent. Washed cold like they said, zero bleed. The black is still black, the red is still blood red. <em>Built to last.</em> Got three people asking where it's from just walking to a coffee shop.</p>
+      <div class="review-meta"><span>SIZE // <b>M</b></span><span>USUAL // <b>S/M</b></span></div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-head"><span>04.038 — A.BERLIN</span><span class="verified">VERIFIED</span></div>
+      <div class="review-stars stars">★ ★ ★ ★ ★</div>
+      <h3 class="review-title">THE IMPERFECTION IS THE POINT.</h3>
+      <p class="review-body">My piece has a heavy dye bleed on the right side that the product shots don't show. Messaged them. They said: <em>"That's yours, no one else has it."</em> That settled it for me.</p>
+      <div class="review-meta"><span>SIZE // <b>XL</b></span><span>USUAL // <b>XL</b></span></div>
+    </div>
+  </div>
+
+  <div class="reviews-load">
+    <button class="btn-load">LOAD MORE →</button>
+  </div>
+</section>
+
+<!-- COMPLETE THE LOOK -->
+<section class="section-complete">
+  <div class="complete-head">
+    <div>
+      <span class="section-label">✦ PAIRS WITH</span>
+      <h2 class="section-title">COMPLETE IT</h2>
+    </div>
+    <a href="index.html#runway" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--blood);text-decoration:none;border-bottom:1px solid rgba(200,40,28,.3);padding-bottom:6px;">VIEW ALL →</a>
+  </div>
+  <div class="complete-grid">
+    <a href="#" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp1" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">SHIELD VISOR<br>BLACK / GOLD</div>
+        <div class="complete-meta"><span>EYEWEAR</span><span><b>$68</b></span></div>
+      </div>
+    </a>
+    <a href="product-blackyellow.html" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp2" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">BLACK &amp; GOLD<br>SWEATSHIRT</div>
+        <div class="complete-meta"><span>HOODIES</span><span><b>$148</b></span></div>
+      </div>
+    </a>
+    <a href="product-multicolor.html" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp3" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">MULTI—COLOR<br>SWEATSHIRT</div>
+        <div class="complete-meta"><span>HOODIES</span><span><b>$148</b></span></div>
+      </div>
+    </a>
+    <a href="product-green.html" class="complete-card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="comp4" alt="">
+      <div class="complete-quick">+</div>
+      <div class="complete-info">
+        <div class="complete-name">GREEN<br>DESIGN</div>
+        <div class="complete-meta"><span>HOODIES</span><span><b>$138</b></span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-img"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-img="gallery1" alt=""></div>
+  <div class="sticky-info">
+    <div class="sticky-name">RED &amp; BLACK DYE HOODIE</div>
+    <div class="sticky-price">$158.00 / SIZE <b id="stickySize">—</b></div>
+  </div>
+  <div class="sticky-options">
+    <span class="sticky-select">RD/BLK</span>
+  </div>
+  <button class="sticky-add" id="stickyAdd">ADD TO BAG →</button>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3 class="cart-title">YOUR BAG</h3>
+    <button class="cart-close" id="cartClose">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">YOUR BAG IS EMPTY.<br>BEGIN THE TRANSMISSION.</div>
+  </div>
+  <div class="cart-foot">
+    <div class="cart-subtotal"><span>SUBTOTAL</span><b id="cartSubtotal">$0.00</b></div>
+    <button class="cart-checkout"><span>CHECKOUT →</span></button>
+  </div>
+</aside>
+
+<div class="toast" id="toast">ADDED TO BAG</div>
+
+<footer>
+  <span class="big">UNKNOWN</span>
+  <div>© 2025 UNKNOWN BRAND // <a href="index.html">RETURN HOME</a> // 未知</div>
+</footer>
+
+<script>
+/* ================================================================
+   IMAGE CONFIG — RED & BLACK DYE PRODUCT PAGE
+   Folder: dye_red_black_webp/
+   All filenames from the dye set screenshot:
+   back_far_01, back_far_02, detail_arm_01, detail_back_01,
+   detail_sleeve_01, detail_strings_01, front_close_01,
+   front_medium_01, front_medium_02, side_medium_01, solo_01
+================================================================ */
+const BASE = 'https://raw.githubusercontent.com/colinwillow/unknown/refs/heads/main/';
+const DYE  = BASE + 'dye_red_black_webp/';
+const IMG  = BASE + 'images_webp/';
+const BY   = BASE + 'black_7_yellow_webp/';
+const GRN  = BASE + 'sweatshirt_green_design_webp/';
+const MULTI= BASE + 'sweatshirt_mutli_color_webp/';
+
+const IMGS = {
+  // Gallery — 6 shots from dye set
+  gallery1: DYE + 'front_medium_01.webp',
+  gallery2: DYE + 'front_close_01.webp',
+  gallery3: DYE + 'back_far_01.webp',
+  gallery4: DYE + 'detail_back_01.webp',
+  gallery5: DYE + 'side_medium_01.webp',
+  gallery6: DYE + 'solo_01.webp',
+
+  // Story / frequency section
+  story:    DYE + 'back_far_02.webp',
+
+  // Styling shots — pull from dye set and general
+  style1:   DYE + 'front_medium_02.webp',
+  style2:   DYE + 'detail_arm_01.webp',
+  style3:   DYE + 'detail_sleeve_01.webp',
+
+  // In the wild — dye shots + images_webp lifestyle
+  wild1:    DYE + 'front_close_01.webp',
+  wild2:    IMG + 'hero_04.webp',
+  wild3:    IMG + 'lifestyle_01.webp',
+  wild4:    DYE + 'back_far_02.webp',
+  wild5:    IMG + 'hero_09.webp',
+  wild6:    IMG + 'hero_13.webp',
+  wild7:    DYE + 'detail_strings_01.webp',
+  wild8:    IMG + 'lifestyle_02.webp',
+
+  // Complete the look
+  comp1:    IMG + 'glasses_05.webp',
+  comp2:    BY  + 'black_%26_yellow_hero.webp',
+  comp3:    MULTI + 'multi_solo_01_result.webp',
+  comp4:    GRN + 'green_sweatshirt_hero.webp',
+};
+
+// Carousel — mix of all dye set shots
+const CAROUSEL_IMGS = [
+  DYE + 'front_medium_01.webp',
+  DYE + 'front_close_01.webp',
+  DYE + 'back_far_01.webp',
+  DYE + 'back_far_02.webp',
+  DYE + 'detail_arm_01.webp',
+  DYE + 'detail_back_01.webp',
+  DYE + 'detail_sleeve_01.webp',
+  DYE + 'detail_strings_01.webp',
+  DYE + 'front_medium_02.webp',
+  DYE + 'side_medium_01.webp',
+  DYE + 'solo_01.webp',
+];
+
+// Populate all data-img elements
+document.querySelectorAll('img[data-img]').forEach(el => {
+  const src = IMGS[el.dataset.img];
+  if (src) el.src = src;
+});
+
+// Build carousel (2× for seamless loop)
+(function(){
+  const track = document.getElementById('ppTrack');
+  const all = [...CAROUSEL_IMGS, ...CAROUSEL_IMGS];
+  all.forEach(src => {
+    const div = document.createElement('div');
+    div.className = 'pp-carousel-item';
+    const img = document.createElement('img');
+    img.src = src; img.alt = '';
+    div.appendChild(img);
+    track.appendChild(div);
+  });
+})();
+
+/* ========= CURSOR ========= */
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing'),label=document.getElementById('cursorLabel');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';label.style.left=mx+'px';label.style.top=my+'px';});
+function loop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);}loop();
+document.querySelectorAll('a,button,.swatch,.gallery-thumb,.stylist-card,.wild-item,.complete-card,.review-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{document.body.classList.add('hovering');label.textContent=el.dataset.cursor||(el.tagName==='A'||el.tagName==='BUTTON'?'CLICK':'VIEW');label.classList.add('show');});
+  el.addEventListener('mouseleave',()=>{document.body.classList.remove('hovering');label.classList.remove('show');});
+});
+
+/* ========= HUD ========= */
+function tick(){const d=new Date();const t=[d.getUTCHours(),d.getUTCMinutes(),d.getUTCSeconds()].map(n=>String(n).padStart(2,'0')).join(':');document.getElementById('hudTime').textContent=t+' UTC';}
+setInterval(tick,1000);tick();
+let viewers=9;
+setInterval(()=>{viewers+=Math.random()>.5?1:-1;viewers=Math.max(5,Math.min(22,viewers));const v=document.getElementById('hudView');if(v)v.innerHTML=`VIEWING NOW: <b style="color:var(--blood-hot)">${String(viewers).padStart(4,'0')}</b>`;},2400);
+
+/* ========= NAV ========= */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60));
+
+/* ========= GALLERY ========= */
+const stage=document.getElementById('galleryStage');
+const thumbsEl=document.getElementById('galleryThumbs');
+const galleryNum=document.getElementById('galleryNum');
+thumbsEl.addEventListener('click',e=>{
+  const t=e.target.closest('.gallery-thumb');if(!t)return;
+  const i=t.dataset.i;
+  document.querySelectorAll('.gallery-thumb').forEach(el=>el.classList.toggle('active',el===t));
+  document.querySelectorAll('.gallery-img').forEach(el=>el.classList.toggle('active',el.dataset.i===i));
+  galleryNum.textContent=String(parseInt(i)+1).padStart(2,'0');
+});
+stage.addEventListener('mousemove',e=>{
+  const r=stage.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  const active=stage.querySelector('.gallery-img.active img');
+  if(active)active.style.transform=`scale(1.15) translate(${-x*30}px,${-y*30}px)`;
+});
+stage.addEventListener('mouseleave',()=>{const active=stage.querySelector('.gallery-img.active img');if(active)active.style.transform='';});
+
+/* ========= STOCK ========= */
+let stock=9;
+const stockCount=document.getElementById('stockCount');
+const stockBar=document.getElementById('stockBar');
+function updateStock(){stockCount.textContent=stock;stockBar.style.width=Math.max(8,(stock/18)*100)+'%';}
+setInterval(()=>{if(Math.random()>.75&&stock>1){stock--;updateStock();}},12000);
+updateStock();
+
+/* ========= SWATCHES ========= */
+const colorName=document.getElementById('colorName');
+document.querySelectorAll('.swatch').forEach(s=>{
+  s.addEventListener('click',()=>{document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));s.classList.add('active');colorName.textContent=s.dataset.name;});
+});
+
+/* ========= SIZE ========= */
+const sizeName=document.getElementById('sizeName');
+const stickySize=document.getElementById('stickySize');
+let selectedSize=null;
+document.querySelectorAll('.size-btn:not(.oos)').forEach(b=>{
+  b.addEventListener('click',()=>{document.querySelectorAll('.size-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedSize=b.dataset.size;sizeName.textContent=selectedSize;stickySize.textContent=selectedSize;});
+});
+
+/* ========= QTY ========= */
+const qtyD=document.getElementById('qtyDisplay');let qty=1;
+document.querySelectorAll('.qty-btn').forEach(b=>{
+  b.addEventListener('click',()=>{if(b.dataset.q==='+'&&qty<10)qty++;if(b.dataset.q==='-'&&qty>1)qty--;qtyD.textContent=qty;});
+});
+
+/* ========= ADD TO BAG ========= */
+const cart=[];
+const addBtn=document.getElementById('addToBag');
+const stickyAdd=document.getElementById('stickyAdd');
+const cartCount=document.getElementById('cartCount');
+const toast=document.getElementById('toast');
+function addToCart(){
+  if(!selectedSize){sizeName.textContent='SELECT A SIZE';sizeName.style.color='var(--blood-hot)';setTimeout(()=>{sizeName.style.color='';sizeName.textContent='SELECT';},1800);return;}
+  cart.push({name:'RED & BLACK DYE HOODIE',size:selectedSize,color:colorName.textContent,qty:qty,price:158,img:IMGS['gallery1']});
+  cartCount.textContent=cart.reduce((a,c)=>a+c.qty,0);
+  renderCart();
+  addBtn.classList.add('adding');addBtn.querySelector('span').innerHTML='✓ ADDED';
+  setTimeout(()=>{addBtn.classList.remove('adding');addBtn.querySelector('span').innerHTML='ADD TO BAG <span class="arr">→</span>';},1400);
+  toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2400);
+}
+addBtn.addEventListener('click',addToCart);
+stickyAdd.addEventListener('click',addToCart);
+
+/* ========= CART DRAWER ========= */
+const cartTrig=document.getElementById('cartTrigger');
+const cartDrawer=document.getElementById('cartDrawer');
+const cartOverlay=document.getElementById('cartOverlay');
+const cartClose=document.getElementById('cartClose');
+const cartBody=document.getElementById('cartBody');
+const cartSubtotal=document.getElementById('cartSubtotal');
+function openCart(){cartDrawer.classList.add('open');cartOverlay.classList.add('show');}
+function closeCart(){cartDrawer.classList.remove('open');cartOverlay.classList.remove('show');}
+cartTrig.addEventListener('click',openCart);
+cartClose.addEventListener('click',closeCart);
+cartOverlay.addEventListener('click',closeCart);
+function renderCart(){
+  if(!cart.length){cartBody.innerHTML='<div class="cart-empty">YOUR BAG IS EMPTY.<br>BEGIN THE TRANSMISSION.</div>';cartSubtotal.textContent='$0.00';return;}
+  cartBody.innerHTML=cart.map((item,i)=>`<div class="cart-item"><div class="cart-item-img"><img src="${item.img}" alt=""></div><div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-meta">SIZE ${item.size} / ${item.color} / QTY ${item.qty}</div><div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div><button class="cart-item-remove" data-i="${i}">REMOVE</button></div></div>`).join('');
+  cartBody.querySelectorAll('.cart-item-remove').forEach(b=>{b.addEventListener('click',()=>{cart.splice(parseInt(b.dataset.i),1);cartCount.textContent=cart.reduce((a,c)=>a+c.qty,0);renderCart();});});
+  cartSubtotal.textContent='$'+cart.reduce((a,c)=>a+c.price*c.qty,0).toFixed(2);
+}
+
+/* ========= WISHLIST ========= */
+document.getElementById('wishBtn').addEventListener('click',function(){this.classList.toggle('active');});
+
+/* ========= STICKY BAR ========= */
+const sticky=document.getElementById('stickyBar');
+window.addEventListener('scroll',()=>{sticky.classList.toggle('show',window.scrollY>window.innerHeight*.7);});
+
+/* ========= SCRAMBLE ========= */
+const CHARS='!<>-_\\/[]{}—=+*^?#____ABCDEFGHIJKLMNOPQRSTUVWXYZ未知？血';
+class Scramble{
+  constructor(el){this.el=el;this.original=el.innerHTML;this.done=false;}
+  run(){if(this.done)return;this.done=true;const text=this.el.textContent;let frame=0;const total=18;const start=text.split('').map(()=>Math.floor(Math.random()*8));const ends=text.split('').map((_,i)=>start[i]+Math.floor(Math.random()*8)+6);const int=setInterval(()=>{let out='';for(let i=0;i<text.length;i++){if(frame<start[i]||frame>ends[i]||text[i]===' '||text[i]==='\n')out+=text[i];else out+=CHARS[Math.floor(Math.random()*CHARS.length)];}this.el.textContent=out;frame++;if(frame>total){clearInterval(int);this.el.innerHTML=this.original;}},40);}
+}
+const sObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.target._s)e.target._s.run();});},{threshold:.3});
+document.querySelectorAll('.section-title,.freq-quote,.info-title').forEach(el=>{el._s=new Scramble(el);sObs.observe(el);});
+
+/* ========= REVEAL ========= */
+const rObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='translateY(0)';}});},{threshold:.1});
+document.querySelectorAll('.spec-row,.stylist-card,.wild-item,.review-card,.complete-card').forEach((el,i)=>{
+  el.style.opacity=0;el.style.transform='translateY(40px)';
+  el.style.transition=`opacity .8s cubic-bezier(.16,1,.3,1) ${i*.04}s, transform .8s cubic-bezier(.16,1,.3,1) ${i*.04}s`;
+  rObs.observe(el);
+});
+</script>
+</body>
+</html>
