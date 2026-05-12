@@ -1,0 +1,144 @@
+{
+  "products": [
+    {
+      "key": "blackgold",
+      "name": "BLACK & GOLD",
+      "page": "product-blackyellow.html",
+      "folder": "black_7_yellow_webp",
+      "price": "$148",
+      "tag": "★ SIGNATURE",
+      "accent": "#C8960A",
+      "slots": {
+        "hero": "black_&_yellow_hero",
+        "front": "black_&_yellow_product_01",
+        "back": "black_&_yellow_hero",
+        "detail": "black_&_yellow_product_01",
+        "environment": "black_&_yellow_hero",
+        "solo": "black_&_yellow_product_01"
+      },
+      "mainPageSlots": ["col1","runway1","look2"]
+    },
+    {
+      "key": "yellow",
+      "name": "YELLOW",
+      "page": "product-yellow.html",
+      "folder": "yellow_patterned_webp",
+      "price": "$128",
+      "tag": "PATTERNED",
+      "accent": "#D4A017",
+      "slots": {
+        "hero": "yellow_product_01",
+        "front": "yellow_product_01",
+        "back": "yellow_product_01",
+        "detail": "yellow_product_01",
+        "environment": "yellow_product_01",
+        "solo": "yellow_product_01"
+      },
+      "mainPageSlots": ["col2","runway4"]
+    },
+    {
+      "key": "green",
+      "name": "GREEN",
+      "page": "product-green.html",
+      "folder": "sweatshirt_green_design_webp",
+      "price": "$138",
+      "tag": "DESIGN",
+      "accent": "#2D6B3A",
+      "slots": {
+        "hero": "green_sweatshirt_hero",
+        "front": "green_sweatshirt_hero",
+        "back": "green_sweatshirt_solo",
+        "detail": "green_sweatshirt_hero",
+        "environment": "green_sweatshirt_hero",
+        "solo": "green_sweatshirt_solo"
+      },
+      "mainPageSlots": ["col3","runway5","look8"]
+    },
+    {
+      "key": "multicolor",
+      "name": "MULTI—COLOR",
+      "page": "product-multicolor.html",
+      "folder": "sweatshirt_mutli_color_webp",
+      "price": "$148",
+      "tag": "★ CAPSULE",
+      "accent": "#8B2FC9",
+      "slots": {
+        "hero": "multi_solo_01_result",
+        "front": "multi_solo_01_result",
+        "back": "multi_solo_02_result",
+        "detail": "multi_solo_01_result",
+        "environment": "multi_solo_01_result",
+        "solo": "multi_solo_02_result"
+      },
+      "mainPageSlots": ["col4","runway3"]
+    },
+    {
+      "key": "burgundy",
+      "name": "ACID WASH / BURGUNDY",
+      "page": "product-dye-redblack.html",
+      "folder": "dye_red_black_webp",
+      "price": "$158",
+      "tag": "ACID WASH",
+      "accent": "#7A1F3D",
+      "slots": {
+        "hero": "front_medium_01",
+        "front": "front_medium_01",
+        "back": "back_far_01",
+        "side": "side_medium_01",
+        "detail": "detail_back_01",
+        "environment": "back_far_02",
+        "solo": "solo_01",
+        "extra": ["front_close_01","front_medium_02","detail_arm_01","detail_sleeve_01","detail_strings_01"]
+      },
+      "mainPageSlots": ["col5","runway2","runway7","statement3","look5"]
+    },
+    {
+      "key": "eyewear",
+      "name": "SHIELD VISOR",
+      "page": "product-eyewear.html",
+      "folder": "images_webp",
+      "price": "$68",
+      "tag": "EYEWEAR",
+      "accent": "#C8960A",
+      "slots": {
+        "hero": "glasses_05",
+        "front": "glasses_01",
+        "back": "glasses_02",
+        "detail": "glasses_03",
+        "environment": "glasses_05",
+        "solo": "glasses_01"
+      },
+      "mainPageSlots": ["runway6","eyewear","look6"]
+    }
+  ],
+  "mainPageImagePool": {
+    "heroSlides": [
+      {"folder":"dye_red_black_webp","file":"front_close_01"},
+      {"folder":"images_webp","file":"hero_01"},
+      {"folder":"dye_red_black_webp","file":"back_far_02"},
+      {"folder":"images_webp","file":"cinematic_01"},
+      {"folder":"dye_red_black_webp","file":"side_medium_01"},
+      {"folder":"images_webp","file":"hero_03"}
+    ],
+    "statement1": {"folder":"images_webp","file":"back_far_02"},
+    "statement2": {"folder":"images_webp","file":"hero_13"},
+    "look1": {"folder":"images_webp","file":"back_far_02"},
+    "look2": {"folder":"images_webp","file":"hero_04"},
+    "look3": {"folder":"images_webp","file":"closeup_01"},
+    "look4": {"folder":"images_webp","file":"wide_01"},
+    "look7": {"folder":"images_webp","file":"hero_17"},
+    "look9": {"folder":"images_webp","file":"hero_06"},
+    "lifestyle": [
+      {"folder":"images_webp","file":"hero_02"},
+      {"folder":"images_webp","file":"lifestyle_01"},
+      {"folder":"images_webp","file":"hero_06"},
+      {"folder":"images_webp","file":"lifestyle_02"},
+      {"folder":"images_webp","file":"hero_09"},
+      {"folder":"images_webp","file":"hero_13"},
+      {"folder":"images_webp","file":"back_01"},
+      {"folder":"images_webp","file":"hero_17"},
+      {"folder":"images_webp","file":"lifestyle_05"},
+      {"folder":"images_webp","file":"pose_01"}
+    ]
+  }
+}
