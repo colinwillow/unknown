@@ -961,41 +961,71 @@ html,body{overflow-x:hidden!important;max-width:100vw!important;}
    LANDING — ALL INTERACTIVE JS
 ============================================================ */
 
-// ── CURSOR ───────────────────────────────────────────────────
+// ── SCROLL LOCK while landing is visible ─────────────────────
+document.body.style.overflow = 'hidden';
+
+// ── DETECT TOUCH / MOBILE ────────────────────────────────────
+const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+// ── CURSOR (desktop only) ────────────────────────────────────
 const ldDot  = document.createElement('div');
 const ldRing = document.createElement('div');
-Object.assign(ldDot.style,{position:'fixed',width:'8px',height:'8px',background:'#C8960A',
-  borderRadius:'50%',pointerEvents:'none',zIndex:'999999',transform:'translate(-50%,-50%)',
-  boxShadow:'0 0 10px 3px rgba(200,150,10,.9)',left:'-200px',top:'-200px'});
-Object.assign(ldRing.style,{position:'fixed',width:'34px',height:'34px',
-  border:'1.5px solid rgba(200,150,10,.75)',borderRadius:'50%',pointerEvents:'none',
-  zIndex:'999998',transform:'translate(-50%,-50%)',
-  transition:'width .3s,height .3s,border-color .3s',left:'-200px',top:'-200px'});
-document.body.appendChild(ldDot);
-document.body.appendChild(ldRing);
+if(!IS_TOUCH){
+  Object.assign(ldDot.style,{position:'fixed',width:'8px',height:'8px',background:'#C8960A',
+    borderRadius:'50%',pointerEvents:'none',zIndex:'999999',transform:'translate(-50%,-50%)',
+    boxShadow:'0 0 10px 3px rgba(200,150,10,.9)',left:'-200px',top:'-200px'});
+  Object.assign(ldRing.style,{position:'fixed',width:'34px',height:'34px',
+    border:'1.5px solid rgba(200,150,10,.75)',borderRadius:'50%',pointerEvents:'none',
+    zIndex:'999998',transform:'translate(-50%,-50%)',
+    transition:'width .3s,height .3s,border-color .3s',left:'-200px',top:'-200px'});
+  document.body.appendChild(ldDot);
+  document.body.appendChild(ldRing);
+}
 
 let LX=-999,LY=-999,LRX=-999,LRY=-999;
+
+// Mouse tracking (desktop)
 document.addEventListener('mousemove',e=>{
   LX=e.clientX; LY=e.clientY;
-  ldDot.style.left=LX+'px'; ldDot.style.top=LY+'px';
+  if(!IS_TOUCH){ ldDot.style.left=LX+'px'; ldDot.style.top=LY+'px'; }
 });
+
+// Touch tracking (mobile) — feed same LX/LY so proximity effects work
+document.addEventListener('touchmove',e=>{
+  const t=e.touches[0];
+  LX=t.clientX; LY=t.clientY;
+},{passive:true});
+
+// Also capture tap position so a single tap updates coords
+document.addEventListener('touchstart',e=>{
+  const t=e.touches[0];
+  LX=t.clientX; LY=t.clientY;
+},{passive:true});
 
 function ldCursorLoop(){
   if(document.getElementById('landing')?.classList.contains('gone'))return;
-  LRX+=(LX-LRX)*.2; LRY+=(LY-LRY)*.2;
-  ldRing.style.left=LRX+'px'; ldRing.style.top=LRY+'px';
+  if(!IS_TOUCH){
+    LRX+=(LX-LRX)*.2; LRY+=(LY-LRY)*.2;
+    ldRing.style.left=LRX+'px'; ldRing.style.top=LRY+'px';
+  }
   requestAnimationFrame(ldCursorLoop);
 }
 ldCursorLoop();
 
-document.querySelectorAll('.ld-enter,.ld-skip').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{ldDot.style.opacity='0';ldRing.style.width='54px';ldRing.style.height='54px';ldRing.style.borderColor='rgba(255,200,58,.95)';});
-  el.addEventListener('mouseleave',()=>{ldDot.style.opacity='1';ldRing.style.width='34px';ldRing.style.height='34px';ldRing.style.borderColor='rgba(200,150,10,.75)';});
-});
+if(!IS_TOUCH){
+  document.querySelectorAll('.ld-enter,.ld-skip').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ldDot.style.opacity='0';ldRing.style.width='54px';ldRing.style.height='54px';ldRing.style.borderColor='rgba(255,200,58,.95)';});
+    el.addEventListener('mouseleave',()=>{ldDot.style.opacity='1';ldRing.style.width='34px';ldRing.style.height='34px';ldRing.style.borderColor='rgba(200,150,10,.75)';});
+  });
+}
 
 function cleanupLandingCursor(){
-  [ldDot,ldRing].forEach(el=>{el.style.transition='opacity .5s';el.style.opacity='0';});
-  setTimeout(()=>{ldDot.remove();ldRing.remove();},600);
+  if(!IS_TOUCH){
+    [ldDot,ldRing].forEach(el=>{el.style.transition='opacity .5s';el.style.opacity='0';});
+    setTimeout(()=>{ldDot.remove();ldRing.remove();},600);
+  }
+  // Restore scroll when landing exits
+  document.body.style.overflow='';
 }
 
 // ── TICK MARKS ───────────────────────────────────────────────
@@ -1166,9 +1196,15 @@ setTimeout(()=>{const wm=document.getElementById('ldWordmark');if(wm)scrambleEl(
 (function autoGlitch(){setTimeout(()=>{if(!entering){const wm=document.getElementById('ldWordmark');if(wm)scrambleEl(wm,'UNKNOWN');}autoGlitch();},5000+Math.random()*8000);})();
 
 // ── ENTER ────────────────────────────────────────────────────
+// Prevent the landing screen itself from scrolling on touch
+document.getElementById('landing').addEventListener('touchmove',e=>{
+  e.preventDefault();
+},{passive:false});
+
 let entering=false;
 function enterSite(){
   if(entering)return; entering=true;
+  document.body.style.overflow=''; // restore scroll immediately on enter
   const wm=document.getElementById('ldWordmark');
   if(wm&&!scrambling)scrambleEl(wm,'UNKNOWN',go);else go();
   function go(){
